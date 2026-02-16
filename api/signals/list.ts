@@ -19,11 +19,20 @@ type VercelResponse = {
   status: (statusCode: number) => VercelResponse;
   setHeader: (name: string, value: string) => void;
   json: (body: unknown) => void;
+  end?: () => void;
 };
 
 type ListHandlerDeps = {
   fetchSignals?: (limit: number) => Promise<TradingSignal[]>;
 };
+
+function applyCorsHeaders(res: VercelResponse): void {
+  const allowedOrigin = process.env.PUBLIC_SITE_ORIGIN ?? "https://www.theitha.com";
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader("Vary", "Origin");
+}
 
 function readLimitParam(query: Record<string, string | string[] | undefined> | undefined): number {
   const raw = query?.limit;
@@ -51,6 +60,18 @@ export function createSignalsListHandler(deps: ListHandlerDeps = {}) {
 
   return async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
     try {
+      applyCorsHeaders(res);
+
+      if (req.method === "OPTIONS") {
+        res.status(204);
+        if (typeof res.end === "function") {
+          res.end();
+        } else {
+          res.json({});
+        }
+        return;
+      }
+
       if (req.method !== "GET") {
         throw new ApiError(405, "METHOD_NOT_ALLOWED", "Only GET is supported");
       }
@@ -81,6 +102,8 @@ export function createSignalsListHandler(deps: ListHandlerDeps = {}) {
         });
         return;
       }
+
+      console.error("signals/list unexpected error", error);
 
       res.status(500).json({
         code: "INTERNAL_SERVER_ERROR",

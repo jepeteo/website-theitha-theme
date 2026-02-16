@@ -15,10 +15,31 @@ type VercelResponse = {
   status: (statusCode: number) => VercelResponse;
   setHeader: (name: string, value: string) => void;
   json: (body: unknown) => void;
+  end?: () => void;
 };
+
+function applyCorsHeaders(res: VercelResponse): void {
+  const allowedOrigin = process.env.PUBLIC_SITE_ORIGIN ?? "https://www.theitha.com";
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader("Vary", "Origin");
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   try {
+    applyCorsHeaders(res);
+
+    if (req.method === "OPTIONS") {
+      res.status(204);
+      if (typeof res.end === "function") {
+        res.end();
+      } else {
+        res.json({});
+      }
+      return;
+    }
+
     if (req.method !== "GET") {
       throw new ApiError(405, "METHOD_NOT_ALLOWED", "Only GET is supported");
     }
@@ -47,6 +68,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       });
       return;
     }
+
+    console.error("signals/summary unexpected error", error);
 
     res.status(500).json({
       code: "INTERNAL_SERVER_ERROR",
