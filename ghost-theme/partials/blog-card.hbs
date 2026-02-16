@@ -1,0 +1,36 @@
+<article data-partial="blog-card" class="card flex flex-col gap-3 overflow-hidden">
+  {{#if feature_image}}
+    <a href="{{url}}" class="block -mx-5 -mt-5 overflow-hidden" aria-hidden="true">
+      {{#if feature_image_alt}}
+        <img
+          src="{{feature_image}}"
+          alt="{{feature_image_alt}}"
+          class="w-full h-44 object-cover transition-transform duration-300 hover:scale-105"
+          loading="lazy"
+        />
+      {{else}}
+        <img
+          src="{{feature_image}}"
+          alt="{{title}}"
+          class="w-full h-44 object-cover transition-transform duration-300 hover:scale-105"
+          loading="lazy"
+        />
+      {{/if}}
+    </a>
+  {{/if}}
+  <div class="flex flex-col gap-2 flex-1">
+    <h3 class="leading-snug">
+      <a href="{{url}}" class="text-text hover:text-primary transition-colors">{{title}}</a>
+    </h3>
+    {{#if excerpt}}
+      <p class="text-muted text-sm line-clamp-2">{{excerpt}}</p>
+    {{/if}}
+    <div class="mt-auto flex items-center gap-2 text-caption">
+      {{#if primary_tag}}
+        <span class="text-primary text-xs font-medium">{{primary_tag.name}}</span>
+        <span class="text-border">&middot;</span>
+      {{/if}}
+      <time datetime="{{date format="YYYY-MM-DD"}}">{{date format="MMM D, YYYY"}}</time>
+    </div>
+  </div>
+</article>

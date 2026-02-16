@@ -1,0 +1,14 @@
+<footer data-partial="footer" class="border-t border-border mt-16">
+  <div class="container py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <span class="font-heading font-semibold text-sm text-text">{{@site.title}}</span>
+      <span class="text-border">&middot;</span>
+      <span class="text-caption">&copy; {{date format="YYYY"}}</span>
+    </div>
+    <nav class="flex items-center gap-4" aria-label="Footer navigation">
+      {{#foreach @site.navigation}}
+        <a href="{{url}}" class="text-caption hover:text-text transition-colors">{{#if label}}{{label}}{{else}}{{title}}{{/if}}</a>
+      {{/foreach}}
+    </nav>
+  </div>
+</footer>

@@ -1,0 +1,35 @@
+<aside data-partial="sidebar" class="flex flex-col gap-6 lg:sticky lg:top-24">
+  {{!-- About / CTA --}}
+  <div class="card flex flex-col gap-3" data-container="sidebar-about">
+    <h3 class="section-title">About</h3>
+    <p class="text-muted text-sm">{{@site.description}}</p>
+  </div>
+
+  {{!-- Recent Posts --}}
+  <div class="card flex flex-col gap-3" data-container="sidebar-recent">
+    <h3 class="section-title">Recent Posts</h3>
+    {{#get "posts" limit="5" order="published_at desc"}}
+      <ul class="flex flex-col gap-2">
+        {{#foreach posts}}
+          <li>
+            <a href="{{url}}" class="text-sm text-muted hover:text-text transition-colors block leading-snug">{{title}}</a>
+          </li>
+        {{/foreach}}
+      </ul>
+    {{/get}}
+  </div>
+
+  {{!-- Tags --}}
+  {{#get "tags" limit="10"}}
+    {{#if tags.length}}
+      <div class="card flex flex-col gap-3" data-container="sidebar-tags">
+        <h3 class="section-title">Topics</h3>
+        <div class="flex flex-wrap gap-2">
+          {{#foreach tags}}
+            <a href="{{url}}" class="text-xs px-3 py-1 rounded-full bg-surface-2 border border-border text-muted hover:text-text hover:border-primary transition-colors">{{name}}</a>
+          {{/foreach}}
+        </div>
+      </div>
+    {{/if}}
+  {{/get}}
+</aside>

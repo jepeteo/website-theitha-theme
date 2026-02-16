@@ -1,0 +1,102 @@
+{{!< default}}
+
+<div data-view="home" class="py-8 flex flex-col gap-8">
+
+  {{!-- ═══ A. Hero ═══ --}}
+  <section aria-labelledby="home-hero-title" class="flex flex-col items-center text-center gap-4 py-8">
+    <h1 id="home-hero-title" class="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+      Theitha <span class="text-primary">Trading</span>
+    </h1>
+    <p class="text-muted text-lg max-w-2xl">
+      Premium signals, real-time market data, and expert analysis — all in one dashboard.
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-3 mt-2">
+      <a href="/signals/" class="btn-primary">View Signals</a>
+      <a href="/markets/" class="btn-outline">Explore Markets</a>
+    </div>
+  </section>
+
+  {{!-- ═══ B. Ticker — already in header, nothing here ═══ --}}
+
+  {{!-- ═══ C. Market Overview (widget inside card frame) ═══ --}}
+  <section aria-labelledby="home-markets-title" data-container="market-overview" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 id="home-markets-title" class="text-base font-semibold text-text">Market Overview</h2>
+        <span class="text-caption">Live data via TradingView</span>
+      </div>
+      <div class="widget-card__body">
+        {{> market-overview}}
+      </div>
+    </div>
+  </section>
+
+  {{!-- ═══ D. Signals Preview (above blog) ═══ --}}
+  <section aria-labelledby="home-signals-title" data-container="signals-preview" class="flex flex-col gap-3">
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <h2 id="home-signals-title" class="section-title">Signals Preview</h2>
+      </div>
+      <a href="/signals/" class="text-primary text-sm font-medium hover:text-accent-hover transition-colors whitespace-nowrap">
+        View all &rarr;
+      </a>
+    </div>
+    {{> signals-section}}
+  </section>
+
+  {{!-- ═══ E. Featured Post / CTA fallback ═══ --}}
+  <section aria-labelledby="home-featured-title" data-container="featured-post" class="flex flex-col gap-3">
+    <h2 id="home-featured-title" class="section-title">Featured Analysis</h2>
+    {{#get "posts" filter="featured:true" limit="1"}}
+      {{#if posts.length}}
+        {{#foreach posts}}
+          <article class="card-highlight flex flex-col md:flex-row gap-5 overflow-hidden">
+            {{#if feature_image}}
+              <a href="{{url}}" class="block md:w-1/3 -mx-5 -mt-5 md:m-0 md:-ml-5 md:-my-5 overflow-hidden flex-shrink-0" aria-hidden="true">
+                <img src="{{feature_image}}" alt="{{title}}" class="w-full h-52 md:h-full object-cover" loading="lazy" />
+              </a>
+            {{/if}}
+            <div class="flex flex-col gap-3 justify-center flex-1">
+              <h3 class="text-lg font-semibold leading-snug">
+                <a href="{{url}}" class="text-text hover:text-primary transition-colors">{{title}}</a>
+              </h3>
+              {{#if excerpt}}
+                <p class="text-muted text-sm line-clamp-3">{{excerpt}}</p>
+              {{/if}}
+              <div class="flex items-center gap-2 text-caption mt-1">
+                <time datetime="{{date format="YYYY-MM-DD"}}">{{date format="MMM D, YYYY"}}</time>
+              </div>
+            </div>
+          </article>
+        {{/foreach}}
+      {{else}}
+        <div class="card-cta flex flex-col items-center text-center gap-3 py-8">
+          <svg class="w-10 h-10 text-primary opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+          </svg>
+          <p class="text-text font-semibold">No featured analysis yet</p>
+          <p class="text-muted text-sm max-w-sm">Check out our latest market insights and trading breakdowns.</p>
+          <a href="/" class="btn-outline mt-2">Browse Articles</a>
+        </div>
+      {{/if}}
+    {{/get}}
+  </section>
+
+  {{!-- ═══ F. Latest Posts (lower priority) ═══ --}}
+  <section aria-labelledby="home-latest-title" class="flex flex-col gap-4">
+    <div class="flex items-end justify-between gap-4">
+      <h2 id="home-latest-title" class="section-title">Latest Posts</h2>
+      <a href="/" class="text-primary text-sm font-medium hover:text-accent-hover transition-colors whitespace-nowrap">
+        All posts &rarr;
+      </a>
+    </div>
+    <div data-container="latest-posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {{#get "posts" limit="6" order="published_at desc"}}
+        {{#foreach posts}}
+          {{> blog-card}}
+        {{/foreach}}
+      {{/get}}
+    </div>
+  </section>
+
+</div>

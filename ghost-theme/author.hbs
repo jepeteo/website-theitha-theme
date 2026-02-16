@@ -1,0 +1,28 @@
+{{!< default}}
+
+<div data-view="author" class="py-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <section class="lg:col-span-8 flex flex-col gap-5" aria-labelledby="author-title">
+    <header class="flex items-center gap-4">
+      {{#if profile_image}}
+        <img src="{{profile_image}}" alt="{{name}}" class="w-16 h-16 rounded-full" />
+      {{/if}}
+      <div class="flex flex-col gap-1">
+        <h1 id="author-title" class="section-title">{{name}}</h1>
+        {{#if bio}}
+          <p class="text-muted text-sm">{{bio}}</p>
+        {{/if}}
+      </div>
+    </header>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {{#foreach posts}}
+        {{> blog-card}}
+      {{/foreach}}
+    </div>
+  </section>
+
+  <aside class="lg:col-span-4" aria-label="Sidebar">
+    {{> sidebar}}
+  </aside>
+</div>
+
+{{pagination}}

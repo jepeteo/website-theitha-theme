@@ -1,0 +1,61 @@
+{{!< default}}
+
+<div data-view="post-detail" class="py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+  {{!-- Main article --}}
+  <article class="lg:col-span-8 flex flex-col gap-6" data-container="post-content" aria-label="Post content">
+    {{#post}}
+      <header class="flex flex-col gap-4">
+        {{#if primary_tag}}
+          <a href="{{primary_tag.url}}" class="text-primary text-xs font-semibold uppercase tracking-widest hover:text-accent-hover transition-colors w-fit">{{primary_tag.name}}</a>
+        {{/if}}
+        <h1 class="text-3xl md:text-4xl font-bold tracking-tight leading-tight">{{title}}</h1>
+        <div class="flex items-center gap-3 text-caption">
+          {{#if primary_author.profile_image}}
+            <img src="{{primary_author.profile_image}}" alt="{{primary_author.name}}" class="w-9 h-9 rounded-full border border-border" />
+          {{/if}}
+          <div class="flex flex-col">
+            <span class="text-text text-sm font-medium">{{primary_author.name}}</span>
+            <div class="flex items-center gap-2 text-xs">
+              <time datetime="{{date format='YYYY-MM-DD'}}">{{date format="MMM D, YYYY"}}</time>
+              {{#if reading_time}}
+                <span class="text-border">&middot;</span>
+                <span>{{reading_time}} min read</span>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {{#if feature_image}}
+        <figure class="-mx-5 md:mx-0 overflow-hidden rounded-none md:rounded-xl">
+          {{#if feature_image_alt}}
+            <img src="{{feature_image}}" alt="{{feature_image_alt}}" class="w-full max-h-96 object-cover" loading="lazy" />
+          {{else}}
+            <img src="{{feature_image}}" alt="{{title}}" class="w-full max-h-96 object-cover" loading="lazy" />
+          {{/if}}
+          {{#if feature_image_caption}}
+            <figcaption class="text-caption text-xs text-center mt-2 px-5 md:px-0">{{feature_image_caption}}</figcaption>
+          {{/if}}
+        </figure>
+      {{/if}}
+
+      <section class="prose-custom max-w-none">
+        {{content}}
+      </section>
+
+      {{!-- Tags footer --}}
+      {{#if tags}}
+        <footer class="flex flex-wrap gap-2 pt-4 border-t border-border">
+          {{#foreach tags}}
+            <a href="{{url}}" class="text-xs px-3 py-1 rounded-full bg-surface-2 border border-border text-muted hover:text-text hover:border-primary transition-colors">{{name}}</a>
+          {{/foreach}}
+        </footer>
+      {{/if}}
+    {{/post}}
+  </article>
+
+  {{!-- Sidebar --}}
+  <aside class="lg:col-span-4" data-container="post-sidebar" aria-label="Post sidebar">
+    {{> sidebar}}
+  </aside>
+</div>

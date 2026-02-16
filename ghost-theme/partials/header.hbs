@@ -1,0 +1,43 @@
+<header data-partial="header" class="sticky top-0 z-50 bg-bg/95 backdrop-blur-sm border-b border-border">
+  {{!-- Row 1: Logo + Navigation --}}
+  <div class="container flex items-center justify-between py-3">
+    <a href="{{@site.url}}" class="flex items-center gap-2 no-underline" aria-label="{{@site.title}} Home">
+      {{#if @site.logo}}
+        <img src="{{@site.logo}}" alt="{{@site.title}}" class="h-8 w-auto" />
+      {{else}}
+        <span class="font-heading text-lg font-bold text-text tracking-tight">{{@site.title}}</span>
+      {{/if}}
+    </a>
+
+    <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
+      {{#foreach @site.navigation}}
+        <a href="{{url}}" class="nav-link">{{#if label}}{{label}}{{else}}{{title}}{{/if}}</a>
+      {{/foreach}}
+    </nav>
+
+    {{!-- Mobile menu button --}}
+    <button
+      class="md:hidden p-2 border-0 bg-transparent"
+      aria-label="Toggle navigation"
+      onclick="document.getElementById('mobile-nav').classList.toggle('hidden')"
+    >
+      <svg class="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
+
+  {{!-- Mobile nav dropdown --}}
+  <nav id="mobile-nav" class="hidden md:hidden border-t border-border" aria-label="Mobile navigation">
+    <div class="container py-3 flex flex-col gap-1">
+      {{#foreach @site.navigation}}
+        <a href="{{url}}" class="nav-link">{{#if label}}{{label}}{{else}}{{title}}{{/if}}</a>
+      {{/foreach}}
+    </div>
+  </nav>
+
+  {{!-- Row 2: Ticker tape full width --}}
+  <div data-container="header-ticker" class="border-t border-border bg-surface">
+    <div id="tv-ticker"></div>
+  </div>
+</header>

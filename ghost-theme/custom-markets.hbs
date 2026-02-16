@@ -1,0 +1,50 @@
+{{!< default}}
+
+<div data-view="markets" class="py-8 flex flex-col gap-8">
+  {{!-- Page header --}}
+  <section aria-labelledby="markets-title" class="flex flex-col items-center text-center gap-3">
+    <h1 id="markets-title" class="text-3xl md:text-4xl font-bold tracking-tight">
+      Live <span class="text-primary">Markets</span>
+    </h1>
+    <p class="text-muted text-base max-w-lg">Real-time charts, market overview, and economic calendar powered by TradingView.</p>
+  </section>
+
+  {{!-- Market Overview --}}
+  <section data-container="markets-overview" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 class="text-base font-semibold text-text">Market Overview</h2>
+        <span class="text-caption">Live data via TradingView</span>
+      </div>
+      <div class="widget-card__body">
+        {{> market-overview}}
+      </div>
+    </div>
+  </section>
+
+  {{!-- Advanced Chart --}}
+  <section data-container="markets-chart" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 class="text-base font-semibold text-text">Advanced Chart</h2>
+        <span class="text-caption">Interactive charting</span>
+      </div>
+      <div class="widget-card__body" style="min-height: 550px;">
+        <div id="tv-advanced-chart" class="w-full"></div>
+      </div>
+    </div>
+  </section>
+
+  {{!-- Economic Calendar --}}
+  <section data-container="markets-calendar" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 class="text-base font-semibold text-text">Economic Calendar</h2>
+        <span class="text-caption">Upcoming events</span>
+      </div>
+      <div class="widget-card__body" style="min-height: 500px;">
+        <div id="tv-economic-calendar" class="w-full"></div>
+      </div>
+    </div>
+  </section>
+</div>
