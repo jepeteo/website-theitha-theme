@@ -15,7 +15,6 @@
         <a href="/markets/" class="nav-link">Markets</a>
         <a href="/signals/" class="nav-link">Signals</a>
         <a href="/blog/" class="nav-link">Blog</a>
-        <a href="#/portal/signup" data-portal="signup" class="nav-link">Subscribe</a>
 
         <div class="relative group">
           <span class="nav-link inline-flex items-center gap-1 cursor-default" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false">
@@ -36,7 +35,10 @@
       {{#if @member}}
         <a href="#/portal/account" data-portal="account" class="btn-outline text-xs px-3 py-1.5">Account</a>
       {{else}}
-        <a href="#/portal/signin" data-portal="signin" class="btn-outline text-xs px-3 py-1.5">Login</a>
+        <div class="flex items-center gap-2">
+          <a href="#/portal/signin" data-portal="signin" class="btn-outline text-xs px-3 py-1.5">Login</a>
+          <a href="#/portal/signup" data-portal="signup" class="btn-primary text-xs px-3 py-1.5">Subscribe</a>
+        </div>
       {{/if}}
     </div>
 
@@ -59,7 +61,6 @@
       <a href="/markets/" class="nav-link">Markets</a>
       <a href="/signals/" class="nav-link">Signals</a>
       <a href="/blog/" class="nav-link">Blog</a>
-      <a href="#/portal/signup" data-portal="signup" class="nav-link">Subscribe</a>
 
       <div class="px-3 pt-2 pb-1 text-caption text-xs uppercase tracking-wide">Links</div>
       <a href="https://christosmentis.substack.com/" target="_blank" rel="noopener noreferrer" class="nav-link pl-5">Substack</a>
@@ -69,7 +70,10 @@
         {{#if @member}}
           <a href="#/portal/account" data-portal="account" class="btn-outline text-xs px-3 py-1.5">Account</a>
         {{else}}
-          <a href="#/portal/signin" data-portal="signin" class="btn-outline text-xs px-3 py-1.5">Login</a>
+          <div class="flex items-center gap-2">
+            <a href="#/portal/signin" data-portal="signin" class="btn-outline text-xs px-3 py-1.5">Login</a>
+            <a href="#/portal/signup" data-portal="signup" class="btn-primary text-xs px-3 py-1.5">Subscribe</a>
+          </div>
         {{/if}}
       </div>
     </div>
