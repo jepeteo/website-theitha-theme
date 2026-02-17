@@ -669,6 +669,53 @@
             font-size: clamp(1.75rem, 7.2vw, 2.5rem);
         }
     }
+
+    .post-share {
+        max-width: 52rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .post-share__title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: var(--muted);
+        text-transform: uppercase;
+    }
+
+    .post-share__list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .post-share__item {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 1.875rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        border: 1px solid var(--border);
+        background-color: var(--surface);
+        color: var(--text);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+        transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+        text-decoration: none;
+    }
+
+    .post-share__item:hover {
+        border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+        color: var(--text);
+        background-color: color-mix(in srgb, var(--accent) 12%, transparent);
+    }
 }
 
 @layer utilities {

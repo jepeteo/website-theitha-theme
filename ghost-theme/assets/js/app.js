@@ -450,6 +450,61 @@ function setupSignalsFilters() {
     });
 }
 
+function initPostShare() {
+    const shareRoot = document.querySelector("[data-post-share]");
+    if (!shareRoot) {
+        return;
+    }
+
+    const pageUrl = encodeURIComponent(shareRoot.getAttribute("data-share-url") || window.location.href);
+    const pageTitle = encodeURIComponent(shareRoot.getAttribute("data-share-title") || document.title);
+    const combinedText = encodeURIComponent(`${decodeURIComponent(pageTitle)} ${decodeURIComponent(pageUrl)}`);
+
+    const featureImage = document.querySelector("[data-container='post-content'] img");
+    const featureImageUrl = featureImage ? encodeURIComponent(featureImage.getAttribute("src") || "") : "";
+
+    const shareUrls = {
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
+        x: `https://twitter.com/intent/tweet?text=${pageTitle}&url=${pageUrl}`,
+        linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${pageUrl}&title=${pageTitle}`,
+        email: `mailto:?subject=${pageTitle}&body=${pageUrl}`,
+        whatsapp: `https://api.whatsapp.com/send?text=${combinedText}`,
+        telegram: `https://t.me/share/url?url=${pageUrl}&text=${pageTitle}`,
+        threads: `https://www.threads.net/intent/post?text=${combinedText}`,
+        bluesky: `https://bsky.app/intent/compose?text=${combinedText}`,
+        reddit: `https://www.reddit.com/submit?url=${pageUrl}&title=${pageTitle}`,
+        pinterest: `https://pinterest.com/pin/create/button/?url=${pageUrl}&description=${pageTitle}${featureImageUrl ? `&media=${featureImageUrl}` : ""}`
+    };
+
+    shareRoot.querySelectorAll("[data-share-platform]").forEach((link) => {
+        const platform = link.getAttribute("data-share-platform");
+        const href = shareUrls[platform];
+        if (!href) {
+            return;
+        }
+        link.setAttribute("href", href);
+    });
+
+    const copyButton = shareRoot.querySelector("[data-copy-link]");
+    if (!copyButton) {
+        return;
+    }
+
+    copyButton.addEventListener("click", async () => {
+        const rawUrl = shareRoot.getAttribute("data-share-url") || window.location.href;
+
+        try {
+            await navigator.clipboard.writeText(rawUrl);
+            copyButton.textContent = "Copied";
+            setTimeout(() => {
+                copyButton.textContent = "Page Link";
+            }, 1200);
+        } catch (_error) {
+            window.prompt("Copy this link:", rawUrl);
+        }
+    });
+}
+
 function renderSummary(target, summary) {
     if (!target) {
         return;
@@ -726,6 +781,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initGlobalHeaderTicker();
     initHomeMarketOverview();
     initMarketsPageWidgets();
+    initPostShare();
 
     // Filter controls
     setupSignalsFilters();
