@@ -475,6 +475,11 @@ function initPostShare() {
             x: `https://x.com/intent/tweet?text=${pageTitle}&url=${pageUrl}`,
             linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${pageUrl}&title=${pageTitle}`,
             email: `mailto:?subject=${pageTitle}&body=${pageUrl}`,
+            whatsapp: `https://api.whatsapp.com/send?text=${combinedText}`,
+            telegram: `https://t.me/share/url?url=${pageUrl}&text=${pageTitle}`,
+            threads: `https://www.threads.net/intent/post?text=${combinedText}`,
+            bluesky: `https://bsky.app/intent/compose?text=${combinedText}`,
+            reddit: `https://www.reddit.com/submit?url=${pageUrl}&title=${pageTitle}`,
             pinterest: `https://pinterest.com/pin/create/button/?url=${pageUrl}&description=${pageTitle}${featureImageUrl ? `&media=${featureImageUrl}` : ""}`
         };
 
@@ -547,7 +552,7 @@ function initPostShare() {
                 }
                 setTimeout(() => {
                     if (copyLabel) {
-                        copyLabel.textContent = "Copy link";
+                        copyLabel.textContent = "Page Link";
                     }
                 }, 1200);
                 setPanelOpen(false);
