@@ -206,7 +206,7 @@ function initHomeMarketOverview() {
             backgroundColor: "#0f1520",
             support_host: "https://www.tradingview.com",
             width: "100%",
-            height: "100%",
+            height: 440,
             symbolsGroups: [
                 {
                     name: "Forex",
