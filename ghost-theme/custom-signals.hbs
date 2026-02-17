@@ -6,7 +6,7 @@
     <h1 id="signals-title" class="text-3xl md:text-4xl font-bold tracking-tight">
       Trading <span class="text-primary">Signals</span>
     </h1>
-    <p class="text-muted text-base max-w-lg">Live trading signals updated throughout the session. Upgrade to unlock full entry details.</p>
+    <p id="signals-subtitle" class="text-muted text-base max-w-lg">Real-time trading signals with entry, SL, and TP levels.</p>
   </section>
 
   {{!-- Summary stats --}}
@@ -27,6 +27,23 @@
           <span class="text-caption">Total</span>
         </div>
       </div>
+    </div>
+
+    {{!-- Visual status filters (demo parity) --}}
+    <div class="flex flex-wrap items-center gap-2" data-signals-status-filters>
+      <button type="button" class="demo-chip demo-chip--active" data-filter-type="status" data-filter-value="all">All</button>
+      <button type="button" class="demo-chip" data-filter-type="status" data-filter-value="active">Active</button>
+      <button type="button" class="demo-chip" data-filter-type="status" data-filter-value="won">Hit TP</button>
+      <button type="button" class="demo-chip" data-filter-type="status" data-filter-value="lost">Stopped</button>
+    </div>
+
+    {{!-- Visual market filters (demo parity) --}}
+    <div class="flex flex-wrap items-center gap-2" data-signals-market-filters>
+      <button type="button" class="demo-chip demo-chip--active" data-filter-type="market" data-filter-value="all">All Markets</button>
+      <button type="button" class="demo-chip" data-filter-type="market" data-filter-value="forex">Forex</button>
+      <button type="button" class="demo-chip" data-filter-type="market" data-filter-value="commodities">Commodities</button>
+      <button type="button" class="demo-chip" data-filter-type="market" data-filter-value="crypto">Crypto</button>
+      <button type="button" class="demo-chip" data-filter-type="market" data-filter-value="indices">Indices</button>
     </div>
   </section>
 

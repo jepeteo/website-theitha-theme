@@ -195,6 +195,30 @@
         color: var(--muted);
     }
 
+    /* ── Demo-style filter chips ── */
+    .demo-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 1.875rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        border: 1px solid var(--border);
+        background-color: var(--surface);
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+    }
+
+    .demo-chip--active {
+        border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+        color: var(--text);
+        background-color: color-mix(in srgb, var(--accent) 12%, transparent);
+    }
+
     /* ── Mono data display ── */
     .data-mono {
         font-family: var(--font-mono);
@@ -238,6 +262,71 @@
 
     .nav-link--active {
         color: var(--accent);
+    }
+
+    .nav-inline .nav,
+    .footer-nav-inline .nav {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-inline .nav a {
+        color: var(--muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        transition: color 0.15s, background-color 0.15s;
+        text-decoration: none;
+    }
+
+    .nav-inline .nav a:hover {
+        color: var(--text);
+        background-color: var(--surface2);
+    }
+
+    .nav-inline .nav .nav-current a {
+        color: var(--accent);
+    }
+
+    .nav-stacked .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-stacked .nav a {
+        display: block;
+        color: var(--muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        transition: color 0.15s, background-color 0.15s;
+        text-decoration: none;
+    }
+
+    .nav-stacked .nav a:hover {
+        color: var(--text);
+        background-color: var(--surface2);
+    }
+
+    .footer-nav-inline .nav a {
+        color: var(--muted);
+        font-size: 0.8125rem;
+        transition: color 0.15s;
+        text-decoration: none;
+    }
+
+    .footer-nav-inline .nav a:hover {
+        color: var(--text);
     }
 
     /* ── Primary button ── */
@@ -307,6 +396,10 @@
         position: relative;
         min-height: 400px;
         overflow: hidden;
+    }
+
+    .widget-card__body--market-overview {
+        min-height: 400px;
     }
 
     .widget-card__body iframe {
@@ -485,6 +578,96 @@
     .prose-custom th {
         background-color: var(--surface2);
         font-weight: 600;
+    }
+
+    /* ── Editorial post typography (Haas-inspired) ── */
+    .post-article {
+        max-width: 100%;
+    }
+
+    .post-header {
+        max-width: 52rem;
+    }
+
+    .post-title {
+        font-size: clamp(2rem, 3.4vw, 3.25rem);
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        font-weight: 700;
+    }
+
+    .post-meta {
+        font-size: 0.875rem;
+        color: var(--muted);
+    }
+
+    .prose-haas {
+        max-width: 52rem;
+        font-size: 1.125rem;
+        line-height: 1.9;
+        letter-spacing: 0;
+        color: var(--text);
+    }
+
+    .prose-haas p {
+        margin-bottom: 1.45em;
+    }
+
+    .prose-haas h2 {
+        font-size: clamp(1.5rem, 2.2vw, 2rem);
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+        margin-top: 2em;
+        margin-bottom: 0.75em;
+        font-weight: 700;
+    }
+
+    .prose-haas h3 {
+        font-size: clamp(1.2rem, 1.5vw, 1.4rem);
+        line-height: 1.35;
+        margin-top: 1.8em;
+        margin-bottom: 0.6em;
+        font-weight: 600;
+    }
+
+    .prose-haas blockquote {
+        margin-top: 1.6em;
+        margin-bottom: 1.6em;
+        padding-left: 1rem;
+        border-left: 3px solid var(--accent);
+        color: var(--muted);
+        font-style: normal;
+    }
+
+    .prose-haas img {
+        margin-top: 1.6em;
+        margin-bottom: 1.25em;
+        border-radius: 0.625rem;
+    }
+
+    .prose-haas figcaption,
+    .prose-haas .kg-image-card figcaption {
+        margin-top: 0.5rem;
+        font-size: 0.8125rem;
+        line-height: 1.5;
+        color: var(--muted);
+        text-align: center;
+    }
+
+    @media (max-width: 1023px) {
+        .post-layout {
+            gap: 2rem;
+        }
+
+        .prose-haas {
+            max-width: 100%;
+            font-size: 1.0625rem;
+            line-height: 1.85;
+        }
+
+        .post-title {
+            font-size: clamp(1.75rem, 7.2vw, 2.5rem);
+        }
     }
 }
 

@@ -4,19 +4,27 @@
   {{!-- Page header --}}
   <section aria-labelledby="markets-title" class="flex flex-col items-center text-center gap-3">
     <h1 id="markets-title" class="text-3xl md:text-4xl font-bold tracking-tight">
-      Live <span class="text-primary">Markets</span>
+      Markets <span class="text-primary">Dashboard</span>
     </h1>
-    <p class="text-muted text-base max-w-lg">Real-time charts, market overview, and economic calendar powered by TradingView.</p>
+    <p class="text-muted text-base max-w-lg">Live charts, quotes, and economic calendar.</p>
+  </section>
+
+  {{!-- Market category chips (visual parity with demo) --}}
+  <section aria-label="Market categories" class="flex flex-wrap items-center justify-center gap-2" data-markets-filters>
+    <button type="button" class="demo-chip demo-chip--active" data-market="forex">Forex</button>
+    <button type="button" class="demo-chip" data-market="commodities">Commodities</button>
+    <button type="button" class="demo-chip" data-market="crypto">Crypto</button>
+    <button type="button" class="demo-chip" data-market="indices">Indices</button>
   </section>
 
   {{!-- Market Overview --}}
   <section data-container="markets-overview" class="flex flex-col gap-3">
     <div class="widget-card">
       <div class="widget-card__header">
-        <h2 class="text-base font-semibold text-text">Market Overview</h2>
-        <span class="text-caption">Live data via TradingView</span>
+        <h2 class="text-base font-semibold text-text">Market Quotes</h2>
+        <span class="text-caption">Real-time quotes</span>
       </div>
-      <div class="widget-card__body">
+      <div class="widget-card__body widget-card__body--market-overview">
         {{> market-overview}}
       </div>
     </div>
@@ -27,7 +35,7 @@
     <div class="widget-card">
       <div class="widget-card__header">
         <h2 class="text-base font-semibold text-text">Advanced Chart</h2>
-        <span class="text-caption">Interactive charting</span>
+        <span class="text-caption">Multi-asset chart</span>
       </div>
       <div class="widget-card__body" style="min-height: 550px;">
         <div id="tv-advanced-chart" class="w-full"></div>

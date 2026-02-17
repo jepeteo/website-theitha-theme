@@ -9,11 +9,38 @@
       {{/if}}
     </a>
 
-    <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
-      {{#foreach @site.navigation}}
-        <a href="{{url}}" class="nav-link">{{#if label}}{{label}}{{else}}{{title}}{{/if}}</a>
-      {{/foreach}}
-    </nav>
+    <div class="hidden md:flex items-center gap-2">
+      <nav class="flex items-center gap-1" aria-label="Main navigation">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/markets/" class="nav-link">Markets</a>
+        <a href="/signals/" class="nav-link">Signals</a>
+
+        <div class="relative group">
+          <a href="/" class="nav-link inline-flex items-center gap-1">
+            Blog
+            <svg class="w-3 h-3 text-muted group-hover:text-text transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </a>
+          <div class="absolute left-0 top-full w-48 hidden group-hover:block group-focus-within:block z-[60] pt-2">
+            <div class="bg-surface border border-border rounded-lg shadow-lg p-1">
+              <a href="/tag/education/" class="nav-link block">Education</a>
+              <a href="/tag/investment-ideas/" class="nav-link block">Investment Ideas</a>
+              <a href="/tag/daily-fx/" class="nav-link block">Daily FX</a>
+            </div>
+          </div>
+        </div>
+
+        <a href="https://christosmentis.substack.com/" target="_blank" rel="noopener noreferrer" class="nav-link">Substack</a>
+        <a href="https://www.amazon.com/dp/B0GLF3H5FV" target="_blank" rel="noopener noreferrer" class="nav-link">Forex Blueprint Series</a>
+      </nav>
+
+      {{#if @member}}
+        <a href="#/portal/account" data-portal="account" class="btn-outline text-xs px-3 py-1.5">Account</a>
+      {{else}}
+        <a href="#/portal/signin" data-portal="signin" class="btn-outline text-xs px-3 py-1.5">Login</a>
+      {{/if}}
+    </div>
 
     {{!-- Mobile menu button --}}
     <button
@@ -30,9 +57,24 @@
   {{!-- Mobile nav dropdown --}}
   <nav id="mobile-nav" class="hidden md:hidden border-t border-border" aria-label="Mobile navigation">
     <div class="container py-3 flex flex-col gap-1">
-      {{#foreach @site.navigation}}
-        <a href="{{url}}" class="nav-link">{{#if label}}{{label}}{{else}}{{title}}{{/if}}</a>
-      {{/foreach}}
+      <a href="/" class="nav-link">Home</a>
+      <a href="/markets/" class="nav-link">Markets</a>
+      <a href="/signals/" class="nav-link">Signals</a>
+
+      <div class="px-3 pt-2 pb-1 text-caption text-xs uppercase tracking-wide">Blog</div>
+      <a href="/tag/education/" class="nav-link pl-5">Education</a>
+      <a href="/tag/investment-ideas/" class="nav-link pl-5">Investment Ideas</a>
+      <a href="/tag/daily-fx/" class="nav-link pl-5">Daily FX</a>
+
+      <a href="https://christosmentis.substack.com/" target="_blank" rel="noopener noreferrer" class="nav-link">Substack</a>
+      <a href="https://www.amazon.com/dp/B0GLF3H5FV" target="_blank" rel="noopener noreferrer" class="nav-link">Forex Blueprint Series</a>
+
+      <div class="pt-2">
+        {{#if @member}}
+          <a href="#/portal/account" data-portal="account" class="btn-outline text-xs px-3 py-1.5">Account</a>
+        {{else}}
+          <a href="#/portal/signin" data-portal="signin" class="btn-outline text-xs px-3 py-1.5">Login</a>
+        {{/if}}
     </div>
   </nav>
 

@@ -5,10 +5,8 @@
       <span class="text-border">&middot;</span>
       <span class="text-caption">&copy; {{date format="YYYY"}}</span>
     </div>
-    <nav class="flex items-center gap-4" aria-label="Footer navigation">
-      {{#foreach @site.navigation}}
-        <a href="{{url}}" class="text-caption hover:text-text transition-colors">{{#if label}}{{label}}{{else}}{{title}}{{/if}}</a>
-      {{/foreach}}
+    <nav aria-label="Footer navigation" class="footer-nav-inline">
+      {{navigation}}
     </nav>
   </div>
 </footer>

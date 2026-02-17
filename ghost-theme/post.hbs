@@ -1,15 +1,15 @@
 {{!< default}}
 
-<div data-view="post-detail" class="py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div data-view="post-detail" class="py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 post-layout">
   {{!-- Main article --}}
-  <article class="lg:col-span-8 flex flex-col gap-6" data-container="post-content" aria-label="Post content">
+  <article class="lg:col-span-8 flex flex-col gap-6 post-article" data-container="post-content" aria-label="Post content">
     {{#post}}
-      <header class="flex flex-col gap-4">
+      <header class="flex flex-col gap-4 post-header">
         {{#if primary_tag}}
           <a href="{{primary_tag.url}}" class="text-primary text-xs font-semibold uppercase tracking-widest hover:text-accent-hover transition-colors w-fit">{{primary_tag.name}}</a>
         {{/if}}
-        <h1 class="text-3xl md:text-4xl font-bold tracking-tight leading-tight">{{title}}</h1>
-        <div class="flex items-center gap-3 text-caption">
+        <h1 class="text-3xl md:text-4xl font-bold tracking-tight leading-tight post-title">{{title}}</h1>
+        <div class="flex items-center gap-3 text-caption post-meta">
           {{#if primary_author.profile_image}}
             <img src="{{primary_author.profile_image}}" alt="{{primary_author.name}}" class="w-9 h-9 rounded-full border border-border" />
           {{/if}}
@@ -39,7 +39,7 @@
         </figure>
       {{/if}}
 
-      <section class="prose-custom max-w-none">
+      <section class="prose-custom prose-haas max-w-none">
         {{content}}
       </section>
 

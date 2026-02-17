@@ -1,6 +1,141 @@
 const SIGNALS_URL = "https://api.theitha.com/api/signals/list";
 const SUMMARY_URL = "https://api.theitha.com/api/signals/summary";
 
+let cachedMemberToken = null;
+let cachedMemberUuid = null;
+let cachedSignalsPayload = null;
+
+const signalsFilterState = {
+    status: "all",
+    market: "all"
+};
+
+const marketChartSymbols = {
+    forex: "FX:EURUSD",
+    commodities: "OANDA:XAUUSD",
+    crypto: "BITSTAMP:BTCUSD",
+    indices: "FOREXCOM:US30"
+};
+
+function looksLikeJwt(value) {
+    return typeof value === "string" && value.split(".").length === 3;
+}
+
+function pickTokenFromObject(obj) {
+    if (!obj || typeof obj !== "object") {
+        return null;
+    }
+
+    const candidates = [
+        obj.access_token,
+        obj.token,
+        obj.jwt,
+        obj.memberToken,
+        obj?.member?.access_token,
+        obj?.member?.token,
+        obj?.member?.jwt,
+        obj?.members?.[0]?.access_token,
+        obj?.members?.[0]?.token,
+        obj?.members?.[0]?.jwt
+    ];
+
+    for (const candidate of candidates) {
+        if (looksLikeJwt(candidate)) {
+            return candidate;
+        }
+    }
+
+    return null;
+}
+
+function readTokenFromStorage() {
+    const storageKeys = [
+        "ghost-members-ssr",
+        "ghost-members-token",
+        "ghost-members-jwt",
+        "ghost-members-current",
+        "ghost-members-session"
+    ];
+
+    const stores = [];
+    if (typeof window !== "undefined" && window.localStorage) {
+        stores.push(window.localStorage);
+    }
+    if (typeof window !== "undefined" && window.sessionStorage) {
+        stores.push(window.sessionStorage);
+    }
+
+    for (const store of stores) {
+        for (const key of storageKeys) {
+            const raw = store.getItem(key);
+            if (!raw) {
+                continue;
+            }
+
+            if (looksLikeJwt(raw)) {
+                return raw;
+            }
+
+            try {
+                const parsed = JSON.parse(raw);
+                const token = pickTokenFromObject(parsed);
+                if (token) {
+                    return token;
+                }
+            } catch (_error) {
+                // not JSON, continue
+            }
+        }
+    }
+
+    return null;
+}
+
+function readCookieValue(name) {
+    const match = document.cookie
+        .split(";")
+        .map((entry) => entry.trim())
+        .find((entry) => entry.startsWith(`${name}=`));
+
+    if (!match) {
+        return null;
+    }
+
+    const raw = match.slice(name.length + 1);
+    try {
+        return decodeURIComponent(raw);
+    } catch (_error) {
+        return raw;
+    }
+}
+
+async function resolveMemberUuid() {
+    if (cachedMemberUuid) {
+        return cachedMemberUuid;
+    }
+
+    try {
+        const response = await fetch("/members/api/member/", {
+            method: "GET",
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            return null;
+        }
+
+        const member = await response.json();
+        if (member && member.uuid) {
+            cachedMemberUuid = member.uuid;
+            return cachedMemberUuid;
+        }
+    } catch (_error) {
+        // Not logged in or endpoint unavailable
+    }
+
+    return null;
+}
+
 /**
  * Mount a TradingView external-embedding widget into a container.
  * Injects a <div> with a JSON config inside a <script> tag pointing
@@ -44,8 +179,7 @@ function initGlobalHeaderTicker() {
             symbols: [
                 { proName: "FX:EURUSD", title: "EURUSD" },
                 { proName: "OANDA:XAUUSD", title: "XAUUSD" },
-                { proName: "BITSTAMP:BTCUSD", title: "BTCUSD" },
-                { proName: "NASDAQ:NDX", title: "NASDAQ" }
+                { proName: "BITSTAMP:BTCUSD", title: "BTCUSD" }
             ],
             showSymbolLogo: true,
             isTransparent: true,
@@ -57,7 +191,7 @@ function initGlobalHeaderTicker() {
 }
 
 function initHomeMarketOverview() {
-    if (!document.querySelector("[data-view='home']")) {
+    if (!document.getElementById("tv-market-overview")) {
         return;
     }
 
@@ -66,10 +200,10 @@ function initHomeMarketOverview() {
         {
             colorTheme: "dark",
             dateRange: "12M",
-            showChart: true,
+            showChart: false,
             locale: "en",
             width: "100%",
-            height: "100%",
+            height: 400,
             largeChartUrl: "",
             isTransparent: true,
             showSymbolLogo: true,
@@ -79,22 +213,30 @@ function initHomeMarketOverview() {
                     title: "Forex",
                     symbols: [
                         { s: "FX:EURUSD", d: "EUR/USD" },
+                        { s: "FX:GBPJPY", d: "GBP/JPY" },
+                        { s: "FX:USDJPY", d: "USD/JPY" },
                         { s: "FX:GBPUSD", d: "GBP/USD" },
-                        { s: "FX:USDJPY", d: "USD/JPY" }
+                        { s: "FX:AUDUSD", d: "AUD/USD" }
                     ]
                 },
                 {
                     title: "Commodities",
                     symbols: [
-                        { s: "OANDA:XAUUSD", d: "Gold" },
-                        { s: "TVC:USOIL", d: "US Oil" }
+                        { s: "OANDA:XAUUSD", d: "XAU/USD - Gold" },
+                        { s: "OANDA:XPTUSD", d: "XPT/USD - Platinum" },
+                        { s: "OANDA:XPDUSD", d: "XPD/USD - Palladium" },
+                        { s: "OANDA:XAGUSD", d: "XAG/USD - Silver" },
+                        { s: "TVC:COPPER", d: "XCU/USD - Copper" }
                     ]
                 },
                 {
                     title: "Crypto",
                     symbols: [
-                        { s: "BITSTAMP:BTCUSD", d: "Bitcoin" },
-                        { s: "BITSTAMP:ETHUSD", d: "Ethereum" }
+                        { s: "BITSTAMP:BTCUSD", d: "BTC/USD" },
+                        { s: "BITSTAMP:ETHUSD", d: "ETH/USD" },
+                        { s: "BINANCE:SOLUSDT", d: "SOL/USD" },
+                        { s: "BITSTAMP:XRPUSD", d: "XRP/USD" },
+                        { s: "BINANCE:BTCUSDT", d: "BTC/USDT" }
                     ]
                 }
             ]
@@ -107,21 +249,33 @@ function initMarketsPageWidgets() {
         return;
     }
 
-    mountTradingViewWidget("tv-advanced-chart",
-        "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js",
-        {
-            symbol: "FX:EURUSD",
-            width: "100%",
-            height: 550,
-            colorTheme: "dark",
-            isTransparent: true,
-            locale: "en",
-            autosize: false
+    const renderAdvancedChart = (symbol) => {
+        const container = document.getElementById("tv-advanced-chart");
+        if (!container) {
+            return;
         }
-    );
+
+        container.innerHTML = "";
+        delete container.dataset.tvInitialized;
+
+        mountTradingViewWidget("tv-advanced-chart",
+            "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js",
+            {
+                symbol,
+                width: "100%",
+                height: 550,
+                theme: "dark",
+                isTransparent: true,
+                locale: "en",
+                autosize: false
+            }
+        );
+    };
+
+    renderAdvancedChart(marketChartSymbols.forex);
 
     mountTradingViewWidget("tv-economic-calendar",
-        "https://s3.tradingview.com/external-embedding/embed-widget-economic-calendar.js",
+        "https://s3.tradingview.com/external-embedding/embed-widget-events.js",
         {
             width: "100%",
             height: 500,
@@ -130,6 +284,19 @@ function initMarketsPageWidgets() {
             locale: "en"
         }
     );
+
+    const marketButtons = Array.from(document.querySelectorAll("[data-markets-filters] [data-market]"));
+    marketButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const market = button.getAttribute("data-market") || "forex";
+            const symbol = marketChartSymbols[market] || marketChartSymbols.forex;
+
+            marketButtons.forEach((item) => item.classList.remove("demo-chip--active"));
+            button.classList.add("demo-chip--active");
+
+            renderAdvancedChart(symbol);
+        });
+    });
 }
 
 /**
@@ -214,6 +381,75 @@ function clearNode(node) {
     }
 }
 
+function classifySignalMarket(symbol) {
+    const value = String(symbol || "").toUpperCase();
+    if (value.includes("BTC") || value.includes("ETH") || value.includes("SOL") || value.includes("XRP")) {
+        return "crypto";
+    }
+    if (value.includes("XAU") || value.includes("XAG") || value.includes("WTI") || value.includes("OIL") || value.includes("BRENT")) {
+        return "commodities";
+    }
+    if (value.includes("US30") || value.includes("NAS") || value.includes("SPX") || value.includes("DAX") || value.includes("DJI")) {
+        return "indices";
+    }
+    return "forex";
+}
+
+function applySignalsFilters(payload) {
+    const signals = Array.isArray(payload?.data) ? payload.data : [];
+
+    const filtered = signals.filter((signal) => {
+        const statusValue = String(signal?.status || "active").toLowerCase();
+        const marketValue = classifySignalMarket(signal?.symbol);
+
+        const statusPass = signalsFilterState.status === "all" || statusValue === signalsFilterState.status;
+        const marketPass = signalsFilterState.market === "all" || marketValue === signalsFilterState.market;
+
+        return statusPass && marketPass;
+    });
+
+    return {
+        ...payload,
+        data: filtered
+    };
+}
+
+function setupSignalsFilters() {
+    const chips = Array.from(document.querySelectorAll("[data-filter-type][data-filter-value]"));
+    if (chips.length === 0) {
+        return;
+    }
+
+    chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+            const filterType = chip.getAttribute("data-filter-type");
+            const filterValue = chip.getAttribute("data-filter-value") || "all";
+
+            if (filterType !== "status" && filterType !== "market") {
+                return;
+            }
+
+            signalsFilterState[filterType] = filterValue;
+
+            const groupSelector = filterType === "status"
+                ? "[data-signals-status-filters] [data-filter-type='status']"
+                : "[data-signals-market-filters] [data-filter-type='market']";
+
+            document.querySelectorAll(groupSelector).forEach((el) => {
+                el.classList.remove("demo-chip--active");
+            });
+            chip.classList.add("demo-chip--active");
+
+            if (cachedSignalsPayload) {
+                const filteredPayload = applySignalsFilters(cachedSignalsPayload);
+                document.querySelectorAll("[data-signals-list]").forEach((target) => {
+                    renderSignals(target, filteredPayload);
+                });
+            }
+        });
+    });
+}
+
 function renderSummary(target, summary) {
     if (!target) {
         return;
@@ -224,10 +460,15 @@ function renderSummary(target, summary) {
     const grid = document.createElement("div");
     grid.className = "grid grid-cols-3 gap-4 text-center";
 
+    const active = Number(summary?.activeSignals ?? summary?.active ?? 0);
+    const winners = Number(summary?.wonSignals ?? summary?.winners ?? 0);
+    const lost = Number(summary?.lostSignals ?? summary?.lost ?? 0);
+    const total = active + winners + lost;
+
     const stats = [
-        { label: "Active", value: summary.active },
-        { label: "Winners", value: summary.winners },
-        { label: "Total", value: summary.total }
+        { label: "Active", value: active },
+        { label: "Winners", value: winners },
+        { label: "Total", value: total }
     ];
 
     stats.forEach(({ label, value }) => {
@@ -329,7 +570,7 @@ function renderSignals(target, payload) {
 
             const badge = document.createElement("span");
             badge.className = isBuy ? "badge badge--buy" : "badge badge--sell";
-            badge.textContent = signal.direction;
+            badge.textContent = signal.direction || (isBuy ? "BUY" : "SELL");
 
             symbolWrap.appendChild(symbol);
             symbolWrap.appendChild(badge);
@@ -405,8 +646,16 @@ function renderSignals(target, payload) {
 }
 
 async function fetchJson(url) {
+    const memberUuid = await resolveMemberUuid();
+    const headers = {};
+    if (memberUuid) {
+        headers["X-Ghost-Member-Uuid"] = memberUuid;
+    }
+
     const response = await fetch(url, {
-        method: "GET"
+        method: "GET",
+        credentials: "include",
+        headers
     });
 
     if (!response.ok) {
@@ -430,9 +679,24 @@ async function loadData() {
             fetchJson(SIGNALS_URL)
         ]);
 
+        cachedSignalsPayload = signals;
+        const filteredSignals = applySignalsFilters(signals);
+
         removeSkeleton();
         summaryTargets.forEach((target) => renderSummary(target, summary));
-        listTargets.forEach((target) => renderSignals(target, signals));
+        listTargets.forEach((target) => renderSignals(target, filteredSignals));
+
+        // Update subtitle based on tier
+        const subtitle = document.getElementById("signals-subtitle");
+        if (subtitle) {
+            if (signals.tier === "paid") {
+                subtitle.textContent = "Live trading signals updated throughout the session. Full access unlocked.";
+            } else if (signals.tier === "free") {
+                subtitle.textContent = "Live trading signals updated throughout the session. Upgrade to unlock all entry details.";
+            } else {
+                subtitle.textContent = "Live trading signals updated throughout the session. Sign in to unlock entry details.";
+            }
+        }
     } catch (error) {
         removeSkeleton();
         summaryTargets.forEach((target) => {
@@ -462,6 +726,9 @@ document.addEventListener("DOMContentLoaded", () => {
     initGlobalHeaderTicker();
     initHomeMarketOverview();
     initMarketsPageWidgets();
+
+    // Filter controls
+    setupSignalsFilters();
 
     // Data after widgets
     loadData();
