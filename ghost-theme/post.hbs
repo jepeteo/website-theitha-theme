@@ -52,20 +52,28 @@
         </footer>
       {{/if}}
 
-      <section class="post-share" aria-label="Share this post">
-        <h3 class="post-share__title">Share this article</h3>
-        <div class="post-share__list" data-post-share data-share-title="{{title}}" data-share-url="{{url absolute='true'}}">
-          <a class="post-share__item" data-share-platform="facebook" href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
-          <a class="post-share__item" data-share-platform="x" href="#" target="_blank" rel="noopener noreferrer">X</a>
-          <a class="post-share__item" data-share-platform="linkedin" href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-          <a class="post-share__item" data-share-platform="email" href="#">Email</a>
-          <a class="post-share__item" data-share-platform="whatsapp" href="#" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-          <a class="post-share__item" data-share-platform="telegram" href="#" target="_blank" rel="noopener noreferrer">Telegram</a>
-          <a class="post-share__item" data-share-platform="threads" href="#" target="_blank" rel="noopener noreferrer">Threads</a>
-          <a class="post-share__item" data-share-platform="bluesky" href="#" target="_blank" rel="noopener noreferrer">Bluesky</a>
-          <a class="post-share__item" data-share-platform="reddit" href="#" target="_blank" rel="noopener noreferrer">Reddit</a>
-          <a class="post-share__item" data-share-platform="pinterest" href="#" target="_blank" rel="noopener noreferrer">Pinterest</a>
-          <button type="button" class="post-share__item" data-copy-link>Page Link</button>
+      <section class="post-share" aria-label="Share this post" data-post-share data-share-title="{{title}}" data-share-url="{{url absolute='true'}}">
+        <button type="button" class="post-share__trigger" data-share-toggle aria-expanded="false" aria-haspopup="true">
+          Share
+        </button>
+
+        <div class="post-share__panel hidden" data-share-panel>
+          <div class="post-share__group post-share__group--primary">
+            <a class="post-share__item" data-share-platform="x" href="#" target="_blank" rel="noopener noreferrer">X</a>
+            <a class="post-share__item" data-share-platform="facebook" href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a class="post-share__item" data-share-platform="linkedin" href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a class="post-share__item" data-share-platform="pinterest" href="#" target="_blank" rel="noopener noreferrer">Pinterest</a>
+            <button type="button" class="post-share__item" data-copy-link>Page Link</button>
+          </div>
+
+          <div class="post-share__group post-share__group--more">
+            <a class="post-share__item" data-share-platform="email" href="#">Email</a>
+            <a class="post-share__item" data-share-platform="whatsapp" href="#" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            <a class="post-share__item" data-share-platform="telegram" href="#" target="_blank" rel="noopener noreferrer">Telegram</a>
+            <a class="post-share__item" data-share-platform="threads" href="#" target="_blank" rel="noopener noreferrer">Threads</a>
+            <a class="post-share__item" data-share-platform="bluesky" href="#" target="_blank" rel="noopener noreferrer">Bluesky</a>
+            <a class="post-share__item" data-share-platform="reddit" href="#" target="_blank" rel="noopener noreferrer">Reddit</a>
+          </div>
         </div>
       </section>
     {{/post}}

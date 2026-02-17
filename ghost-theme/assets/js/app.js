@@ -456,6 +456,12 @@ function initPostShare() {
         return;
     }
 
+    const toggleButton = shareRoot.querySelector("[data-share-toggle]");
+    const sharePanel = shareRoot.querySelector("[data-share-panel]");
+    if (!toggleButton || !sharePanel) {
+        return;
+    }
+
     const pageUrl = encodeURIComponent(shareRoot.getAttribute("data-share-url") || window.location.href);
     const pageTitle = encodeURIComponent(shareRoot.getAttribute("data-share-title") || document.title);
     const combinedText = encodeURIComponent(`${decodeURIComponent(pageTitle)} ${decodeURIComponent(pageUrl)}`);
@@ -486,6 +492,40 @@ function initPostShare() {
     });
 
     const copyButton = shareRoot.querySelector("[data-copy-link]");
+    const setPanelOpen = (isOpen) => {
+        if (isOpen) {
+            sharePanel.classList.remove("hidden");
+            toggleButton.setAttribute("aria-expanded", "true");
+        } else {
+            sharePanel.classList.add("hidden");
+            toggleButton.setAttribute("aria-expanded", "false");
+        }
+    };
+
+    toggleButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const isOpen = !sharePanel.classList.contains("hidden");
+        setPanelOpen(!isOpen);
+    });
+
+    document.addEventListener("click", (event) => {
+        if (!shareRoot.contains(event.target)) {
+            setPanelOpen(false);
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            setPanelOpen(false);
+        }
+    });
+
+    sharePanel.querySelectorAll("a[data-share-platform]").forEach((link) => {
+        link.addEventListener("click", () => {
+            setPanelOpen(false);
+        });
+    });
+
     if (!copyButton) {
         return;
     }
@@ -499,6 +539,7 @@ function initPostShare() {
             setTimeout(() => {
                 copyButton.textContent = "Page Link";
             }, 1200);
+            setPanelOpen(false);
         } catch (_error) {
             window.prompt("Copy this link:", rawUrl);
         }
