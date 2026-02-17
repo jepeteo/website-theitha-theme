@@ -29,8 +29,9 @@ type ListHandlerDeps = {
 function applyCorsHeaders(res: VercelResponse): void {
   const allowedOrigin = process.env.PUBLIC_SITE_ORIGIN ?? "https://www.theitha.com";
   res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Ghost-Member-Uuid");
   res.setHeader("Vary", "Origin");
 }
 

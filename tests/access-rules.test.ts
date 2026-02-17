@@ -7,6 +7,7 @@ import type { TradingSignal } from "../src/contracts/signals.js";
 const baseSignal: TradingSignal = {
   id: "sig_1",
   symbol: "XAUUSD",
+  status: "active",
   direction: "buy",
   entry: 2600,
   stopLoss: 2580,
@@ -18,7 +19,8 @@ const baseSignal: TradingSignal = {
 const btcSignal: TradingSignal = {
   ...baseSignal,
   id: "sig_2",
-  symbol: "BTCUSD"
+  symbol: "BTCUSD",
+  status: "won"
 };
 
 test("anonymous members see all signals locked", () => {

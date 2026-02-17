@@ -10,6 +10,8 @@ type GhostMemberProduct = {
 type GhostMemberResponse = {
   members?: Array<{
     id?: string;
+    uuid?: string;
+    email?: string;
     status?: string;
     subscriptions?: Array<{ status?: string }>;
     products?: GhostMemberProduct[];
@@ -76,7 +78,9 @@ async function generateAdminJwt(env: AppEnv): Promise<string> {
 export type GhostAdminClient = {
   createAdminToken: () => Promise<string>;
   fetchMember: (memberId: string) => Promise<GhostMember | null>;
-  resolveMemberTier: (memberId: string) => Promise<MemberTier>;
+  fetchMemberByUuid: (uuid: string) => Promise<GhostMember | null>;
+  resolveMemberTier: (memberId: string, email?: string | null) => Promise<MemberTier>;
+  resolveMemberTierByUuid: (uuid: string) => Promise<{ memberId: string; email: string | null; tier: MemberTier } | null>;
 };
 
 export function createGhostAdminClient(env: AppEnv): GhostAdminClient {
@@ -110,7 +114,12 @@ export function createGhostAdminClient(env: AppEnv): GhostAdminClient {
     return body.members?.[0] ?? null;
   }
 
-  async function resolveMemberTier(memberId: string): Promise<MemberTier> {
+  async function resolveMemberTier(memberId: string, email?: string | null): Promise<MemberTier> {
+    const normalizedEmail = email ? email.trim().toLowerCase() : "";
+    if (normalizedEmail && env.adminBypassEmails.includes(normalizedEmail)) {
+      return "paid";
+    }
+
     const cacheKey = `ghost-tier:${memberId}`;
     const cached = memberTierCache.get(cacheKey);
     if (cached) {
@@ -124,9 +133,66 @@ export function createGhostAdminClient(env: AppEnv): GhostAdminClient {
     return tier;
   }
 
+  async function fetchMemberByUuid(
+    uuid: string
+  ): Promise<GhostMember | null> {
+    const separator = env.ghostAdminApiUrl.endsWith("/") ? "" : "/";
+    const endpoint =
+      `${env.ghostAdminApiUrl}${separator}members/` +
+      `?filter=uuid:'${encodeURIComponent(uuid)}'&include=subscriptions,products,tiers`;
+
+    const adminToken = await createAdminToken();
+
+    const response = await fetch(endpoint, {
+      method: "GET",
+      headers: {
+        Authorization: `Ghost ${adminToken}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const body = (await response.json()) as GhostMemberResponse;
+    return body.members?.[0] ?? null;
+  }
+
+  async function resolveMemberTierByUuid(
+    uuid: string
+  ): Promise<{ memberId: string; email: string | null; tier: MemberTier } | null> {
+    const cacheKey = `ghost-tier-uuid:${uuid}`;
+    const cached = memberTierCache.get(cacheKey);
+
+    const member = cached ? null : await fetchMemberByUuid(uuid);
+    if (!member && !cached) {
+      return null;
+    }
+
+    const email = member?.email ?? null;
+    const memberId = member?.id ?? uuid;
+
+    const normalizedEmail = email ? email.trim().toLowerCase() : "";
+    if (normalizedEmail && env.adminBypassEmails.includes(normalizedEmail)) {
+      return { memberId, email, tier: "paid" };
+    }
+
+    if (cached) {
+      return { memberId, email, tier: cached };
+    }
+
+    const tier = resolveTierFromMemberPayload(member);
+    memberTierCache.set(cacheKey, tier, env.memberCacheTtlSeconds);
+
+    return { memberId, email, tier };
+  }
+
   return {
     createAdminToken,
     fetchMember,
-    resolveMemberTier
+    fetchMemberByUuid,
+    resolveMemberTier,
+    resolveMemberTierByUuid
   };
 }

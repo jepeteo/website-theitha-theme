@@ -23,6 +23,7 @@ export function toSignalView(
   if (!isVisible) {
     const lockedSignal: LockedSignal = {
       symbol: signal.symbol,
+      status: signal.status,
       locked: true
     };
 
@@ -32,6 +33,7 @@ export function toSignalView(
   const fullSignal: FullSignal = {
     id: signal.id,
     symbol: signal.symbol,
+    status: signal.status,
     locked: false,
     direction: signal.direction,
     entry: signal.entry,

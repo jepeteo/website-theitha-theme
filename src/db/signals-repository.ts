@@ -1,5 +1,6 @@
 import type { Pool } from "pg";
 import type {
+  SignalStatus,
   SignalSymbol,
   SignalsSummaryResponse,
   TradingSignal
@@ -8,6 +9,7 @@ import type {
 type SignalRow = {
   id: string;
   symbol: SignalSymbol;
+  status: SignalStatus;
   direction: "buy" | "sell";
   entry: string;
   stop_loss: string;
@@ -27,6 +29,7 @@ function mapSignalRow(row: SignalRow): TradingSignal {
   return {
     id: row.id,
     symbol: row.symbol,
+    status: row.status,
     direction: row.direction,
     entry: Number(row.entry),
     stopLoss: Number(row.stop_loss),
@@ -74,6 +77,7 @@ export async function fetchRecentSignals(
     SELECT
       id,
       symbol,
+      status,
       direction,
       entry,
       stop_loss,

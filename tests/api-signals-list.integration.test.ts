@@ -54,6 +54,7 @@ const mockedSignals: TradingSignal[] = [
   {
     id: "sig_xau",
     symbol: "XAUUSD",
+    status: "active",
     direction: "buy",
     entry: 2600,
     stopLoss: 2580,
@@ -64,6 +65,7 @@ const mockedSignals: TradingSignal[] = [
   {
     id: "sig_btc",
     symbol: "BTCUSD",
+    status: "lost",
     direction: "sell",
     entry: 100000,
     stopLoss: 102000,

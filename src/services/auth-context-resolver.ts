@@ -3,6 +3,7 @@ import { getAppEnv } from "../config/env.js";
 import type { AuthContext } from "../contracts/auth-context.js";
 import type { AppEnv } from "../config/env.js";
 import { createGhostAdminClient } from "./ghost-admin-client.js";
+import type { GhostAdminClient } from "./ghost-admin-client.js";
 
 export type RequestLike = {
   headers: Record<string, string | string[] | undefined>;
@@ -11,7 +12,8 @@ export type RequestLike = {
 export type ResolveAuthContextDeps = {
   env?: AppEnv;
   verifyJwt?: typeof verifyMemberJwt;
-  resolveTier?: (memberId: string) => Promise<"free" | "paid">;
+  resolveTier?: (memberId: string, email?: string | null) => Promise<"free" | "paid">;
+  adminClient?: GhostAdminClient;
 };
 
 function readHeader(
@@ -61,13 +63,16 @@ export async function resolveAuthContextFromRequest(
   const env = deps.env ?? getAppEnv();
   const verifyJwt = deps.verifyJwt ?? verifyMemberJwt;
   const resolveTier =
-    deps.resolveTier ?? (async (memberId: string) => createGhostAdminClient(env).resolveMemberTier(memberId));
+    deps.resolveTier ??
+    (async (memberId: string, email?: string | null) =>
+      createGhostAdminClient(env).resolveMemberTier(memberId, email));
 
   const authHeader = readHeader(req.headers, "authorization");
   const cookieHeader = readHeader(req.headers, "cookie");
+  const memberUuid = readHeader(req.headers, "x-ghost-member-uuid");
   const token = readBearerToken(authHeader) ?? readTokenFromCookie(cookieHeader);
 
-  if (!token) {
+  if (!token && !memberUuid) {
     return {
       memberId: null,
       email: null,
@@ -76,8 +81,31 @@ export async function resolveAuthContextFromRequest(
     };
   }
 
-  const verified = await verifyJwt(token, env);
-  const tier = await resolveTier(verified.sub);
+  // Path 1: UUID-based auth (frontend sends member UUID from Ghost same-origin endpoint)
+  if (!token && memberUuid) {
+    const client = deps.adminClient ?? createGhostAdminClient(env);
+    const result = await client.resolveMemberTierByUuid(memberUuid);
+
+    if (!result) {
+      return {
+        memberId: null,
+        email: null,
+        tier: "anonymous",
+        isAuthenticated: false
+      };
+    }
+
+    return {
+      memberId: result.memberId,
+      email: result.email,
+      tier: result.tier,
+      isAuthenticated: true
+    };
+  }
+
+  // Path 2: JWT-based auth (original path)
+  const verified = await verifyJwt(token!, env);
+  const tier = await resolveTier(verified.sub, verified.email ?? null);
 
   return {
     memberId: verified.sub,

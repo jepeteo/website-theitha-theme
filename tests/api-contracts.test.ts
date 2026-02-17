@@ -25,6 +25,7 @@ test("locked signal response shape has null confidential fields", () => {
     data: [
       {
         symbol: "BTCUSD",
+        status: "active",
         locked: true
       }
     ]

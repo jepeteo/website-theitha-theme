@@ -12,10 +12,22 @@ export type AppEnv = {
   ghostAdminApiUrl: string;
   ghostAdminApiKey: string;
   databaseUrl: string;
+  adminBypassEmails: string[];
   jwksCacheTtlSeconds: number;
   memberCacheTtlSeconds: number;
   summaryCacheTtlSeconds: number;
 };
+
+function readCsvEmails(value: string | undefined): string[] {
+  if (!value || value.trim() === "") {
+    return [];
+  }
+
+  return value
+    .split(",")
+    .map((part) => part.trim().toLowerCase())
+    .filter((part) => part.length > 0);
+}
 
 function requireNonEmpty(name: string, value: string | undefined): string {
   if (!value || value.trim() === "") {
@@ -62,6 +74,7 @@ export function getAppEnv(processEnv: NodeJS.ProcessEnv = process.env): AppEnv {
     ghostAdminApiUrl,
     ghostAdminApiKey,
     databaseUrl,
+    adminBypassEmails: readCsvEmails(processEnv.ADMIN_BYPASS_EMAILS),
     jwksCacheTtlSeconds: readPositiveInt(
       processEnv.JWKS_CACHE_TTL,
       DEFAULT_JWKS_CACHE_TTL_SECONDS,
