@@ -33,7 +33,10 @@
       </nav>
 
       {{#if @member}}
-        <a href="#/portal/account" data-portal="account" class="btn-outline text-xs px-3 py-1.5">Account</a>
+        <div class="flex items-center gap-2">
+          <a href="#/portal/account" data-portal="account" class="btn-outline text-xs px-3 py-1.5">Account</a>
+          <a href="#/portal/signup" data-portal="signup" class="btn-primary text-xs px-3 py-1.5">Subscribe</a>
+        </div>
       {{else}}
         <div class="flex items-center gap-2">
           <a href="#/portal/signin" data-portal="signin" class="btn-outline text-xs px-3 py-1.5">Login</a>
@@ -68,7 +71,10 @@
 
       <div class="pt-2">
         {{#if @member}}
-          <a href="#/portal/account" data-portal="account" class="btn-outline text-xs px-3 py-1.5">Account</a>
+          <div class="flex items-center gap-2">
+            <a href="#/portal/account" data-portal="account" class="btn-outline text-xs px-3 py-1.5">Account</a>
+            <a href="#/portal/signup" data-portal="signup" class="btn-primary text-xs px-3 py-1.5">Subscribe</a>
+          </div>
         {{else}}
           <div class="flex items-center gap-2">
             <a href="#/portal/signin" data-portal="signin" class="btn-outline text-xs px-3 py-1.5">Login</a>
