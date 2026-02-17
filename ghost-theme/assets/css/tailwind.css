@@ -560,6 +560,27 @@
         min-height: 400px;
     }
 
+    .widget-card__body--market-overview .tradingview-widget-container {
+        height: 100%;
+        padding: 0.375rem 0.375rem 0;
+    }
+
+    .widget-card__body--market-overview .tradingview-widget-copyright {
+        font-size: 0.6875rem;
+        color: var(--muted);
+        padding: 0.5rem 0.75rem 0.75rem;
+        text-align: right;
+    }
+
+    .widget-card__body--market-overview .tradingview-widget-copyright a {
+        color: var(--muted);
+        text-decoration: none;
+    }
+
+    .widget-card__body--market-overview .tradingview-widget-copyright a:hover {
+        color: var(--text);
+    }
+
     .widget-card__body iframe {
         border-radius: 0;
     }

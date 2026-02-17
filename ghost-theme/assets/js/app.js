@@ -196,47 +196,46 @@ function initHomeMarketOverview() {
     }
 
     mountTradingViewWidget("tv-market-overview",
-        "https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js",
+        "https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js",
         {
             colorTheme: "dark",
-            dateRange: "12M",
-            showChart: false,
             locale: "en",
-            width: "100%",
-            height: 400,
             largeChartUrl: "https://www.tradingview.com/chart/A9DNWeYB/?symbol=CAPITALCOM%3ACOPPER",
             isTransparent: true,
             showSymbolLogo: true,
-            showFloatingTooltip: false,
-            tabs: [
+            backgroundColor: "#0f1520",
+            support_host: "https://www.tradingview.com",
+            width: "100%",
+            height: "100%",
+            symbolsGroups: [
                 {
-                    title: "Forex",
+                    name: "Forex",
                     symbols: [
-                        { s: "FX:EURUSD", d: "EUR/USD" },
-                        { s: "FX:GBPJPY", d: "GBP/JPY" },
-                        { s: "FX:USDJPY", d: "USD/JPY" },
-                        { s: "FX:GBPUSD", d: "GBP/USD" },
-                        { s: "FX:AUDUSD", d: "AUD/USD" }
+                        { name: "TICKMILL:EURUSD", displayName: "EUR/USD" },
+                        { name: "OANDA:GBPJPY", displayName: "GBP/JPY" },
+                        { name: "OANDA:USDJPY", displayName: "USD/JPY" },
+                        { name: "FPMARKETS:GBPUSD", displayName: "GBP/USD" },
+                        { name: "OANDA:AUDUSD", displayName: "AUD/USD" }
                     ]
                 },
                 {
-                    title: "Commodities",
+                    name: "Commodities",
                     symbols: [
-                        { s: "OANDA:XAUUSD", d: "XAU/USD - Gold" },
-                        { s: "OANDA:XPTUSD", d: "XPT/USD - Platinum" },
-                        { s: "OANDA:XPDUSD", d: "XPD/USD - Palladium" },
-                        { s: "OANDA:XAGUSD", d: "XAG/USD - Silver" },
-                        { s: "CAPITALCOM:COPPER", d: "Copper" }
+                        { name: "PEPPERSTONE:XAUUSD", displayName: "XAU/USD - Gold" },
+                        { name: "CAPITALCOM:SILVER", displayName: "XAG/USD - Silver" },
+                        { name: "OANDA:XPTUSD", displayName: "XPT/USD - Platinum" },
+                        { name: "OANDA:XPDUSD", displayName: "XPD/USD - Palladium" },
+                        { name: "CAPITALCOM:COPPER", displayName: "XCU/USD - Copper" }
                     ]
                 },
                 {
-                    title: "Crypto",
+                    name: "Crypto",
                     symbols: [
-                        { s: "BITSTAMP:BTCUSD", d: "BTC/USD" },
-                        { s: "BITSTAMP:ETHUSD", d: "ETH/USD" },
-                        { s: "BINANCE:SOLUSDT", d: "SOL/USD" },
-                        { s: "BITSTAMP:XRPUSD", d: "XRP/USD" },
-                        { s: "BINANCE:BTCUSDT", d: "BTC/USDT" }
+                        { name: "OANDA:BTCUSD", displayName: "BTC/USD" },
+                        { name: "OANDA:ETHUSD", displayName: "ETH/USD" },
+                        { name: "PEPPERSTONE:SOLUSD", displayName: "SOL/USD" },
+                        { name: "PEPPERSTONE:XRPUSD", displayName: "XRP/USD" },
+                        { name: "COINBASE:BTCUSDT", displayName: "BTC/USDT" }
                     ]
                 }
             ]
