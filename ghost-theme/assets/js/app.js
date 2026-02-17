@@ -204,7 +204,7 @@ function initHomeMarketOverview() {
             locale: "en",
             width: "100%",
             height: 400,
-            largeChartUrl: "",
+            largeChartUrl: "https://www.tradingview.com/chart/A9DNWeYB/?symbol=CAPITALCOM%3ACOPPER",
             isTransparent: true,
             showSymbolLogo: true,
             showFloatingTooltip: false,
@@ -226,7 +226,7 @@ function initHomeMarketOverview() {
                         { s: "OANDA:XPTUSD", d: "XPT/USD - Platinum" },
                         { s: "OANDA:XPDUSD", d: "XPD/USD - Palladium" },
                         { s: "OANDA:XAGUSD", d: "XAG/USD - Silver" },
-                        { s: "CAPITALCOM:XCUUSD", d: "XCUUSD - Copper" }
+                        { s: "CAPITALCOM:COPPER", d: "Copper" }
                     ]
                 },
                 {
