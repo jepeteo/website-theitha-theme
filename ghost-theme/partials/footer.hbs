@@ -1,12 +1,40 @@
-<footer data-partial="footer" class="border-t border-border mt-16">
-  <div class="container py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-    <div class="flex items-center gap-2">
-      <span class="font-heading font-semibold text-sm text-text">{{@site.title}}</span>
-      <span class="text-border">&middot;</span>
-      <span class="text-caption">&copy; {{date format="YYYY"}}</span>
+<footer data-partial="footer" class="border-t border-border mt-16 bg-surface/40">
+  <div class="container py-10 flex flex-col gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section class="flex flex-col gap-2">
+        <h3 class="font-heading font-semibold text-base text-text">{{@site.title}}</h3>
+        <p class="text-caption text-sm max-w-sm">Premium signals, real-time market data, and focused market insights for active traders.</p>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <h3 class="text-caption uppercase tracking-wide">Navigation</h3>
+        <nav aria-label="Footer navigation" class="footer-nav-inline nav-stacked">
+          {{navigation}}
+        </nav>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <h3 class="text-caption uppercase tracking-wide">Explore</h3>
+        <div class="nav-stacked">
+          <ul class="nav">
+            <li><a href="/markets/">Markets</a></li>
+            <li><a href="/signals/">Signals</a></li>
+            <li><a href="https://christosmentis.substack.com/" target="_blank" rel="noopener noreferrer">Substack</a></li>
+          </ul>
+        </div>
+      </section>
     </div>
-    <nav aria-label="Footer navigation" class="footer-nav-inline">
-      {{navigation}}
-    </nav>
+
+    <div class="border-t border-border pt-4 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2 text-caption">
+        <span>&copy; {{date format="YYYY"}}</span>
+        <span class="text-border">&middot;</span>
+        <span>{{@site.title}}</span>
+      </div>
+
+      <a href="https://mtxstudio.com" target="_blank" rel="noopener noreferrer" class="text-caption hover:text-text transition-colors">
+        Made by MTX Studio
+      </a>
+    </div>
   </div>
 </footer>
