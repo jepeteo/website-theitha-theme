@@ -451,98 +451,110 @@ function setupSignalsFilters() {
 }
 
 function initPostShare() {
-    const shareRoot = document.querySelector("[data-post-share]");
-    if (!shareRoot) {
+    const shareRoots = Array.from(document.querySelectorAll("[data-post-share]"));
+    if (shareRoots.length === 0) {
         return;
     }
 
-    const toggleButton = shareRoot.querySelector("[data-share-toggle]");
-    const sharePanel = shareRoot.querySelector("[data-share-panel]");
-    if (!toggleButton || !sharePanel) {
-        return;
-    }
-
-    const pageUrl = encodeURIComponent(shareRoot.getAttribute("data-share-url") || window.location.href);
-    const pageTitle = encodeURIComponent(shareRoot.getAttribute("data-share-title") || document.title);
-    const combinedText = encodeURIComponent(`${decodeURIComponent(pageTitle)} ${decodeURIComponent(pageUrl)}`);
-
-    const featureImage = document.querySelector("[data-container='post-content'] img");
-    const featureImageUrl = featureImage ? encodeURIComponent(featureImage.getAttribute("src") || "") : "";
-
-    const shareUrls = {
-        facebook: `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
-        x: `https://twitter.com/intent/tweet?text=${pageTitle}&url=${pageUrl}`,
-        linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${pageUrl}&title=${pageTitle}`,
-        email: `mailto:?subject=${pageTitle}&body=${pageUrl}`,
-        whatsapp: `https://api.whatsapp.com/send?text=${combinedText}`,
-        telegram: `https://t.me/share/url?url=${pageUrl}&text=${pageTitle}`,
-        threads: `https://www.threads.net/intent/post?text=${combinedText}`,
-        bluesky: `https://bsky.app/intent/compose?text=${combinedText}`,
-        reddit: `https://www.reddit.com/submit?url=${pageUrl}&title=${pageTitle}`,
-        pinterest: `https://pinterest.com/pin/create/button/?url=${pageUrl}&description=${pageTitle}${featureImageUrl ? `&media=${featureImageUrl}` : ""}`
-    };
-
-    shareRoot.querySelectorAll("[data-share-platform]").forEach((link) => {
-        const platform = link.getAttribute("data-share-platform");
-        const href = shareUrls[platform];
-        if (!href) {
+    shareRoots.forEach((shareRoot) => {
+        const toggleButton = shareRoot.querySelector("[data-share-toggle]");
+        const sharePanel = shareRoot.querySelector("[data-share-panel]");
+        if (!toggleButton || !sharePanel) {
             return;
         }
-        link.setAttribute("href", href);
-    });
 
-    const copyButton = shareRoot.querySelector("[data-copy-link]");
-    const setPanelOpen = (isOpen) => {
-        if (isOpen) {
-            sharePanel.classList.remove("hidden");
-            toggleButton.setAttribute("aria-expanded", "true");
-        } else {
-            sharePanel.classList.add("hidden");
-            toggleButton.setAttribute("aria-expanded", "false");
-        }
-    };
+        const pageUrl = encodeURIComponent(shareRoot.getAttribute("data-share-url") || window.location.href);
+        const pageTitle = encodeURIComponent(shareRoot.getAttribute("data-share-title") || document.title);
+        const combinedText = encodeURIComponent(`${decodeURIComponent(pageTitle)} ${decodeURIComponent(pageUrl)}`);
 
-    toggleButton.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const isOpen = !sharePanel.classList.contains("hidden");
-        setPanelOpen(!isOpen);
-    });
+        const featureImage = document.querySelector("[data-container='post-content'] img");
+        const featureImageUrl = featureImage ? encodeURIComponent(featureImage.getAttribute("src") || "") : "";
 
-    document.addEventListener("click", (event) => {
-        if (!shareRoot.contains(event.target)) {
-            setPanelOpen(false);
-        }
-    });
+        const shareUrls = {
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`,
+            x: `https://x.com/intent/tweet?text=${pageTitle}&url=${pageUrl}`,
+            linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${pageUrl}&title=${pageTitle}`,
+            email: `mailto:?subject=${pageTitle}&body=${pageUrl}`,
+            pinterest: `https://pinterest.com/pin/create/button/?url=${pageUrl}&description=${pageTitle}${featureImageUrl ? `&media=${featureImageUrl}` : ""}`
+        };
 
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-            setPanelOpen(false);
-        }
-    });
-
-    sharePanel.querySelectorAll("a[data-share-platform]").forEach((link) => {
-        link.addEventListener("click", () => {
-            setPanelOpen(false);
+        shareRoot.querySelectorAll("[data-share-platform]").forEach((link) => {
+            const platform = link.getAttribute("data-share-platform");
+            const href = shareUrls[platform];
+            if (!href) {
+                return;
+            }
+            link.setAttribute("href", href);
         });
-    });
 
-    if (!copyButton) {
-        return;
-    }
+        const copyButton = shareRoot.querySelector("[data-copy-link]");
+        const setPanelOpen = (isOpen) => {
+            if (isOpen) {
+                sharePanel.classList.remove("hidden");
+                toggleButton.setAttribute("aria-expanded", "true");
+            } else {
+                sharePanel.classList.add("hidden");
+                toggleButton.setAttribute("aria-expanded", "false");
+            }
+        };
 
-    copyButton.addEventListener("click", async () => {
-        const rawUrl = shareRoot.getAttribute("data-share-url") || window.location.href;
+        toggleButton.addEventListener("click", (event) => {
+            event.stopPropagation();
 
-        try {
-            await navigator.clipboard.writeText(rawUrl);
-            copyButton.textContent = "Copied";
-            setTimeout(() => {
-                copyButton.textContent = "Page Link";
-            }, 1200);
-            setPanelOpen(false);
-        } catch (_error) {
-            window.prompt("Copy this link:", rawUrl);
+            const isOpen = !sharePanel.classList.contains("hidden");
+            shareRoots.forEach((root) => {
+                const panel = root.querySelector("[data-share-panel]");
+                const trigger = root.querySelector("[data-share-toggle]");
+                if (panel && trigger) {
+                    panel.classList.add("hidden");
+                    trigger.setAttribute("aria-expanded", "false");
+                }
+            });
+
+            setPanelOpen(!isOpen);
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!shareRoot.contains(event.target)) {
+                setPanelOpen(false);
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                setPanelOpen(false);
+            }
+        });
+
+        sharePanel.querySelectorAll("a[data-share-platform]").forEach((link) => {
+            link.addEventListener("click", () => {
+                setPanelOpen(false);
+            });
+        });
+
+        if (!copyButton) {
+            return;
         }
+
+        copyButton.addEventListener("click", async () => {
+            const rawUrl = shareRoot.getAttribute("data-share-url") || window.location.href;
+            const copyLabel = copyButton.querySelector("span:last-child");
+
+            try {
+                await navigator.clipboard.writeText(rawUrl);
+                if (copyLabel) {
+                    copyLabel.textContent = "Copied";
+                }
+                setTimeout(() => {
+                    if (copyLabel) {
+                        copyLabel.textContent = "Copy link";
+                    }
+                }, 1200);
+                setPanelOpen(false);
+            } catch (_error) {
+                window.prompt("Copy this link:", rawUrl);
+            }
+        });
     });
 }
 
