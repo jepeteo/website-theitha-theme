@@ -200,7 +200,7 @@ function initHomeMarketOverview() {
         {
             colorTheme: "dark",
             locale: "en",
-            largeChartUrl: "https://www.tradingview.com/chart/A9DNWeYB/?symbol=CAPITALCOM%3ACOPPER",
+            largeChartUrl: "https://www.tradingview.com/chart/A9DNWeYB/",
             isTransparent: true,
             showSymbolLogo: true,
             backgroundColor: "#0f1520",
