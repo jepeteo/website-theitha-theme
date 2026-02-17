@@ -226,7 +226,7 @@ function initHomeMarketOverview() {
                         { s: "OANDA:XPTUSD", d: "XPT/USD - Platinum" },
                         { s: "OANDA:XPDUSD", d: "XPD/USD - Palladium" },
                         { s: "OANDA:XAGUSD", d: "XAG/USD - Silver" },
-                        { s: "CAPITALCOM:XCUUSD", d: "XCU/USD - Copper" }
+                        { s: "CAPITALCOM:COPPER", d: "Copper" }
                     ]
                 },
                 {
