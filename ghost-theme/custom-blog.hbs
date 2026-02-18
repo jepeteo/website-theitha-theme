@@ -1,4 +1,6 @@
 {{!< default}}
+{{!-- Custom template: Blog --}}
+{{!-- Usage: Create a Page in Ghost Admin, set slug to "blog", pick "Blog" template --}}
 
 <div data-view="blog-index" class="py-8 flex flex-col gap-6" data-container="blog-index-list" aria-labelledby="blog-index-title">
   <section class="blog-index-hero flex flex-col gap-3">
@@ -16,13 +18,24 @@
     <a href="/tag/education/">Education</a>
   </nav>
 
-  <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-    {{#foreach posts}}
-      {{> blog-card-index}}
-    {{/foreach}}
-  </section>
+  {{#get "posts" limit="12" include="tags,authors" order="published_at desc"}}
+    <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      {{#foreach posts}}
+        {{> blog-card-index}}
+      {{/foreach}}
+    </section>
 
-  <div class="pt-2">
-    {{pagination}}
-  </div>
+    {{!-- Simple load-more hint --}}
+    {{#if pagination.pages}}
+      {{#if pagination.next}}
+        <div class="pt-2 text-center">
+          <p class="text-muted text-sm">Showing {{pagination.limit}} of {{pagination.total}} articles</p>
+        </div>
+      {{/if}}
+    {{/if}}
+  {{else}}
+    <section class="py-12 text-center">
+      <p class="text-muted text-lg">No articles published yet. Check back soon!</p>
+    </section>
+  {{/get}}
 </div>

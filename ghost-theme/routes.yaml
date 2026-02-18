@@ -1,8 +1,6 @@
 routes:
   /:
     template: home
-  /Blog/:
-    template: index
   /markets/:
     template: custom-markets
   /signals/:
@@ -11,7 +9,7 @@ routes:
 collections:
   /blog/:
     permalink: /blog/{slug}/
-    template: index
+    template: custom-blog
 
 taxonomies:
   tag: /tag/{slug}/
