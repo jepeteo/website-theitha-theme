@@ -1,18 +1,28 @@
 {{!< default}}
 
-<div data-view="blog-index" class="py-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
-  <section class="lg:col-span-8 flex flex-col gap-5" data-container="blog-index-list" aria-labelledby="blog-index-title">
-    <h1 id="blog-index-title" class="section-title">Blog</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-      {{#foreach posts}}
-        {{> blog-card}}
-      {{/foreach}}
-    </div>
+<div data-view="blog-index" class="py-8 flex flex-col gap-6" data-container="blog-index-list" aria-labelledby="blog-index-title">
+  <section class="blog-index-hero flex flex-col gap-3">
+    <h1 id="blog-index-title" class="text-3xl md:text-4xl font-bold tracking-tight">Market Analysis &amp; Insights</h1>
+    <p class="text-muted text-base md:text-lg">In-depth analysis, strategies, and market commentary</p>
   </section>
 
-  <aside class="lg:col-span-4" data-container="blog-sidebar" aria-label="Sidebar">
-    {{> sidebar}}
-  </aside>
-</div>
+  <nav class="blog-topic-chips" aria-label="Blog topics">
+    <a href="/blog/" class="is-active">All</a>
+    <a href="/tag/forex/">Forex</a>
+    <a href="/tag/commodities/">Commodities</a>
+    <a href="/tag/crypto/">Crypto</a>
+    <a href="/tag/stocks/">Stocks</a>
+    <a href="/tag/analysis/">Analysis</a>
+    <a href="/tag/education/">Education</a>
+  </nav>
 
-{{pagination}}
+  <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+    {{#foreach posts}}
+      {{> blog-card-index}}
+    {{/foreach}}
+  </section>
+
+  <div class="pt-2">
+    {{pagination}}
+  </div>
+</div>

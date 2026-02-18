@@ -690,6 +690,75 @@
         border-radius: 0;
     }
 
+    /* ── Blog index page ── */
+    .blog-index-hero {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.75rem;
+    }
+
+    .blog-topic-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .blog-topic-chips a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 1.9rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        border: 1px solid var(--border);
+        background-color: var(--surface);
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        text-decoration: none;
+        transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+    }
+
+    .blog-topic-chips a:hover {
+        color: var(--text);
+        border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+        background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+
+    .blog-topic-chips a.is-active {
+        color: var(--text);
+        border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+        background-color: color-mix(in srgb, var(--accent) 14%, transparent);
+    }
+
+    .blog-index-card {
+        background-color: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0.85rem;
+    }
+
+    .blog-index-card:hover {
+        border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+        transform: translateY(-2px);
+    }
+
+    .blog-index-card__tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.125rem 0.45rem;
+        border-radius: 9999px;
+        border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+        color: var(--accent);
+        background-color: color-mix(in srgb, var(--accent) 8%, transparent);
+        text-decoration: none;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .blog-index-card__tag:hover {
+        color: var(--accent-hover);
+        border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+    }
+
     /* ── CTA card (empty state fallback) ── */
     .card-cta {
         background-color: var(--surface);

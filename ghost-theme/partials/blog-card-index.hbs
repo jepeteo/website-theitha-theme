@@ -1,0 +1,36 @@
+<article data-partial="blog-card-index" class="blog-index-card card group flex flex-col overflow-hidden p-0 h-full">
+  {{#if feature_image}}
+    <a href="{{url}}" class="block overflow-hidden" aria-hidden="true" tabindex="-1">
+      <img
+        src="{{feature_image}}"
+        alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+        class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+        loading="lazy"
+      />
+    </a>
+  {{/if}}
+
+  <div class="p-5 flex flex-col gap-3 flex-1">
+    <div class="flex items-center gap-2 text-xs uppercase tracking-wide">
+      {{#if primary_tag}}
+        <a href="{{primary_tag.url}}" class="blog-index-card__tag">{{primary_tag.name}}</a>
+      {{else}}
+        <span class="blog-index-card__tag">Analysis</span>
+      {{/if}}
+      <span class="text-caption">{{reading_time}}</span>
+    </div>
+
+    <h3 class="text-lg font-semibold leading-snug">
+      <a href="{{url}}" class="text-text hover:text-primary transition-colors">{{title}}</a>
+    </h3>
+
+    {{#if excerpt}}
+      <p class="text-muted text-sm leading-relaxed line-clamp-3">{{excerpt}}</p>
+    {{/if}}
+
+    <div class="mt-auto pt-2 flex items-center justify-between text-xs text-caption">
+      <time datetime="{{date format="YYYY-MM-DD"}}">{{date format="MMM D, YYYY"}}</time>
+      <a href="{{url}}" class="font-medium text-primary hover:text-accent-hover transition-colors">Read article &rarr;</a>
+    </div>
+  </div>
+</article>
