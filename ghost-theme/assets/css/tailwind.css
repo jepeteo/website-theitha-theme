@@ -5,18 +5,18 @@
 @layer base {
     :root {
         /* ── Background hierarchy ── */
-        --bg: #0d1117;
-        --surface: #161b22;
-        --surface2: #1c2129;
-        --surface3: #21262d;
-        --surface-hover: #282e36;
+        --bg: #09090b;
+        --surface: #18181b;
+        --surface2: #27272a;
+        --surface3: #3f3f46;
+        --surface-hover: #52525b;
 
         /* ── Text ── */
-        --text: #c9d1d9;
-        --muted: #8b949e;
+        --text: #fafafa;
+        --muted: #a1a1aa;
 
         /* ── Borders ── */
-        --border: #30363d;
+        --border: #27272a;
 
         /* ── Accent – gold ── */
         --accent: #d4a017;
@@ -57,14 +57,14 @@
     }
 
     html[data-theme="dark"] {
-        --bg: #0d1117;
-        --surface: #161b22;
-        --surface2: #1c2129;
-        --surface3: #21262d;
-        --surface-hover: #282e36;
-        --text: #c9d1d9;
-        --muted: #8b949e;
-        --border: #30363d;
+        --bg: #09090b;
+        --surface: #18181b;
+        --surface2: #27272a;
+        --surface3: #3f3f46;
+        --surface-hover: #52525b;
+        --text: #fafafa;
+        --muted: #a1a1aa;
+        --border: #27272a;
         --accent: #d4a017;
         --accent-hover: #e6b422;
     }
@@ -83,29 +83,29 @@
     }
 
     html[data-theme="forest"] {
-        --bg: #0c1410;
-        --surface: #141f19;
-        --surface2: #1b2922;
-        --surface3: #23332b;
-        --surface-hover: #2c3e34;
-        --text: #d3e4da;
-        --muted: #80a392;
-        --border: #2d4a3a;
-        --accent: #4ade80;
-        --accent-hover: #22c55e;
+        --bg: #0a110d;
+        --surface: #14201a;
+        --surface2: #1e3026;
+        --surface3: #284032;
+        --surface-hover: #32503e;
+        --text: #e8f5ec;
+        --muted: #7dba98;
+        --border: #1e3a2a;
+        --accent: #34d399;
+        --accent-hover: #10b981;
     }
 
     html[data-theme="sun"] {
-        --bg: #14110a;
-        --surface: #1e1a0f;
-        --surface2: #272214;
-        --surface3: #312b1b;
-        --surface-hover: #3c3522;
-        --text: #f0e6cc;
-        --muted: #b8a580;
-        --border: #4a3e26;
-        --accent: #f0b429;
-        --accent-hover: #f7c948;
+        --bg: #15120a;
+        --surface: #211c10;
+        --surface2: #2e2818;
+        --surface3: #3d3420;
+        --surface-hover: #4c4128;
+        --text: #faf3e0;
+        --muted: #c4a96e;
+        --border: #3d3420;
+        --accent: #f59e0b;
+        --accent-hover: #fbbf24;
     }
 
     html[data-theme="light"],
