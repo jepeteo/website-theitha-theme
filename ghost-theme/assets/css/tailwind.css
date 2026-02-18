@@ -4,19 +4,19 @@
 
 @layer base {
     :root {
-        /* ── Background hierarchy ── */
-        --bg: #09090b;
-        --surface: #18181b;
-        --surface2: #27272a;
-        --surface3: #3f3f46;
-        --surface-hover: #52525b;
+        /* ── Background hierarchy (matches TradingView dark) ── */
+        --bg: #131722;
+        --surface: #1e222d;
+        --surface2: #262b3c;
+        --surface3: #2a2e39;
+        --surface-hover: #363a45;
 
         /* ── Text ── */
-        --text: #fafafa;
-        --muted: #a1a1aa;
+        --text: #d1d4dc;
+        --muted: #787b86;
 
         /* ── Borders ── */
-        --border: #27272a;
+        --border: #2a2e39;
 
         /* ── Accent – gold ── */
         --accent: #d4a017;
@@ -57,14 +57,15 @@
     }
 
     html[data-theme="dark"] {
-        --bg: #09090b;
-        --surface: #18181b;
-        --surface2: #27272a;
-        --surface3: #3f3f46;
-        --surface-hover: #52525b;
-        --text: #fafafa;
-        --muted: #a1a1aa;
-        --border: #27272a;
+        /* Matches TradingView's dark mode palette exactly */
+        --bg: #131722;
+        --surface: #1e222d;
+        --surface2: #262b3c;
+        --surface3: #2a2e39;
+        --surface-hover: #363a45;
+        --text: #d1d4dc;
+        --muted: #787b86;
+        --border: #2a2e39;
         --accent: #d4a017;
         --accent-hover: #e6b422;
     }
@@ -83,27 +84,29 @@
     }
 
     html[data-theme="forest"] {
-        --bg: #0a110d;
-        --surface: #14201a;
-        --surface2: #1e3026;
-        --surface3: #284032;
-        --surface-hover: #32503e;
-        --text: #e8f5ec;
+        /* Green tint — intentional contrast with TV dark blue (like Warm) */
+        --bg: #0b1210;
+        --surface: #141e1a;
+        --surface2: #1c2b24;
+        --surface3: #24382e;
+        --surface-hover: #2e4639;
+        --text: #e6f4eb;
         --muted: #7dba98;
-        --border: #1e3a2a;
+        --border: #243a2e;
         --accent: #34d399;
         --accent-hover: #10b981;
     }
 
     html[data-theme="sun"] {
-        --bg: #15120a;
-        --surface: #211c10;
-        --surface2: #2e2818;
-        --surface3: #3d3420;
-        --surface-hover: #4c4128;
+        /* Amber tint — intentional contrast with TV dark blue (like Warm) */
+        --bg: #161207;
+        --surface: #221c0e;
+        --surface2: #302816;
+        --surface3: #3e341e;
+        --surface-hover: #4c4126;
         --text: #faf3e0;
         --muted: #c4a96e;
-        --border: #3d3420;
+        --border: #3a3018;
         --accent: #f59e0b;
         --accent-hover: #fbbf24;
     }
