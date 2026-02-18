@@ -10,12 +10,7 @@
         {{/if}}
         <h1 class="text-3xl md:text-4xl font-bold tracking-tight leading-tight post-title">{{title}}</h1>
         <div class="post-meta-row">
-          <div class="flex items-center gap-3 text-caption post-meta">
-            {{#if primary_author.profile_image}}
-              <img src="{{primary_author.profile_image}}" alt="{{primary_author.name}}" class="w-9 h-9 rounded-full border border-border" />
-            {{/if}}
-            <div class="flex flex-col">
-              <span class="text-text text-sm font-medium">{{primary_author.name}}</span>
+          <div class="flex items-center gap-2 text-caption post-meta">
               <div class="flex items-center gap-2 text-xs">
                 <time datetime="{{date format='YYYY-MM-DD'}}">{{date format="MMM D, YYYY"}}</time>
                 {{#if reading_time}}
@@ -23,7 +18,6 @@
                   <span>{{reading_time}} min read</span>
                 {{/if}}
               </div>
-            </div>
           </div>
 
           <section class="post-share post-share--inline" aria-label="Share this post" data-post-share data-share-title="{{title}}" data-share-url="{{url absolute='true'}}">
