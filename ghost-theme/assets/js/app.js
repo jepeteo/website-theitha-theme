@@ -13,6 +13,44 @@ const signalsFilterState = {
 const THEME_STORAGE_KEY = "theitha-theme";
 const SUPPORTED_THEMES = ["light", "dark", "warm", "forest", "sun"];
 
+function getTradingViewTheme() {
+    const activeTheme = document.documentElement.getAttribute("data-theme") || "dark";
+    return activeTheme === "light" ? "light" : "dark";
+}
+
+function getTradingViewBackground() {
+    return getTradingViewTheme() === "light" ? "#ffffff" : "#0f1520";
+}
+
+function refreshTradingViewWidgetsForTheme() {
+    const widgetContainerIds = [
+        "tv-ticker",
+        "tv-market-overview",
+        "tv-economic-calendar",
+        "tv-forex-heatmap",
+        "tv-forex-cross-rates",
+        "tv-forex-screener-major",
+        "tv-forex-screener-minor",
+        "tv-forex-screener-exotic",
+        "tv-economic-map",
+        "tv-stock-heatmap",
+        "tv-etf-heatmap"
+    ];
+
+    widgetContainerIds.forEach((id) => {
+        const container = document.getElementById(id);
+        if (!container) {
+            return;
+        }
+        container.innerHTML = "";
+        delete container.dataset.tvInitialized;
+    });
+
+    initGlobalHeaderTicker();
+    initHomeMarketOverview();
+    initMarketsPageWidgets();
+}
+
 function getStoredTheme() {
     try {
         const theme = localStorage.getItem(THEME_STORAGE_KEY);
@@ -25,7 +63,8 @@ function getStoredTheme() {
     return "dark";
 }
 
-function applyTheme(theme) {
+function applyTheme(theme, options = {}) {
+    const shouldRefreshWidgets = options.refreshWidgets !== false;
     const normalizedTheme = SUPPORTED_THEMES.includes(theme) ? theme : "dark";
     document.documentElement.setAttribute("data-theme", normalizedTheme);
 
@@ -40,11 +79,15 @@ function applyTheme(theme) {
             select.value = normalizedTheme;
         }
     });
+
+    if (shouldRefreshWidgets && document.readyState !== "loading") {
+        refreshTradingViewWidgetsForTheme();
+    }
 }
 
 function initThemeSwitcher() {
     const initialTheme = getStoredTheme();
-    applyTheme(initialTheme);
+    applyTheme(initialTheme, { refreshWidgets: false });
 
     document.querySelectorAll("[data-theme-select]").forEach((select) => {
         select.value = initialTheme;
@@ -222,7 +265,7 @@ function initGlobalHeaderTicker() {
             showSymbolLogo: true,
             isTransparent: true,
             displayMode: "adaptive",
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             locale: "en"
         }
     );
@@ -236,12 +279,12 @@ function initHomeMarketOverview() {
     mountTradingViewWidget("tv-market-overview",
         "https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js",
         {
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             locale: "en",
             largeChartUrl: "https://www.tradingview.com/chart/",
             isTransparent: true,
             showSymbolLogo: true,
-            backgroundColor: "#0f1520",
+            backgroundColor: getTradingViewBackground(),
             support_host: "https://www.tradingview.com",
             width: "100%",
             height: 440,
@@ -291,7 +334,7 @@ function initMarketsPageWidgets() {
         {
             width: "100%",
             height: 500,
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             isTransparent: true,
             locale: "en"
         }
@@ -300,11 +343,11 @@ function initMarketsPageWidgets() {
     mountTradingViewWidget("tv-forex-heatmap",
         "https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js",
         {
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             isTransparent: true,
             locale: "en",
             currencies: ["EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD", "CNY"],
-            backgroundColor: "#0f1520",
+            backgroundColor: getTradingViewBackground(),
             width: "100%",
             height: 420
         }
@@ -313,11 +356,11 @@ function initMarketsPageWidgets() {
     mountTradingViewWidget("tv-forex-cross-rates",
         "https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js",
         {
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             isTransparent: true,
             locale: "en",
             currencies: ["EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD", "CNY"],
-            backgroundColor: "#0f1520",
+            backgroundColor: getTradingViewBackground(),
             width: "100%",
             height: 420
         }
@@ -332,7 +375,7 @@ function initMarketsPageWidgets() {
             defaultScreen: "major",
             isTransparent: true,
             locale: "en",
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             width: "100%",
             height: 500
         }
@@ -347,7 +390,7 @@ function initMarketsPageWidgets() {
             defaultScreen: "minor",
             isTransparent: true,
             locale: "en",
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             width: "100%",
             height: 500
         }
@@ -362,7 +405,7 @@ function initMarketsPageWidgets() {
             defaultScreen: "exotic",
             isTransparent: true,
             locale: "en",
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             width: "100%",
             height: 500
         }
@@ -378,6 +421,7 @@ function initMarketsPageWidgets() {
         mapElement.style.display = "block";
         mapElement.style.width = "100%";
         mapElement.style.height = "520px";
+        mapElement.setAttribute("theme", getTradingViewTheme());
 
         economicMapContainer.appendChild(mapScript);
         economicMapContainer.appendChild(mapElement);
@@ -393,7 +437,7 @@ function initMarketsPageWidgets() {
             grouping: "sector",
             locale: "en",
             symbolUrl: "",
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             exchanges: [],
             hasTopBar: false,
             isDataSetEnabled: false,
@@ -414,7 +458,7 @@ function initMarketsPageWidgets() {
             grouping: "asset_class",
             locale: "en",
             symbolUrl: "",
-            colorTheme: "dark",
+            colorTheme: getTradingViewTheme(),
             hasTopBar: false,
             isDataSetEnabled: false,
             isZoomEnabled: true,

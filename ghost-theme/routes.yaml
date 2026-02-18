@@ -1,6 +1,8 @@
 routes:
   /:
     template: home
+  /Blog/:
+    template: index
   /markets/:
     template: custom-markets
   /signals/:
