@@ -1,28 +1,47 @@
 {{!< default}}
 
 <div data-view="blog-index" class="py-8 flex flex-col gap-6" data-container="blog-index-list" aria-labelledby="blog-index-title">
+  {{!-- Hero --}}
   <section class="blog-index-hero flex flex-col gap-3">
     <h1 id="blog-index-title" class="text-3xl md:text-4xl font-bold tracking-tight">Market Analysis &amp; Insights</h1>
     <p class="text-muted text-base md:text-lg">In-depth analysis, strategies, and market commentary</p>
   </section>
 
-  <nav class="blog-topic-chips" aria-label="Blog topics">
-    <a href="/blog/" class="is-active">All</a>
-    <a href="/tag/forex/">Forex</a>
-    <a href="/tag/commodities/">Commodities</a>
-    <a href="/tag/crypto/">Crypto</a>
-    <a href="/tag/stocks/">Stocks</a>
-    <a href="/tag/analysis/">Analysis</a>
-    <a href="/tag/education/">Education</a>
-  </nav>
+  {{!-- Chips + search row --}}
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <nav class="blog-topic-chips" aria-label="Blog topics">
+      <a href="/blog/" class="is-active">All</a>
+      <a href="/tag/forex/">Forex</a>
+      <a href="/tag/commodities/">Commodities</a>
+      <a href="/tag/crypto/">Crypto</a>
+      <a href="/tag/stocks/">Stocks</a>
+      <a href="/tag/analysis/">Analysis</a>
+      <a href="/tag/education/">Education</a>
+    </nav>
+    <div class="blog-search-box">
+      <svg class="blog-search-box__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search articles..." class="blog-search-box__input" data-blog-search />
+    </div>
+  </div>
 
-  <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-    {{#foreach posts}}
-      {{> blog-card-index}}
-    {{/foreach}}
-  </section>
+  {{!-- Main grid: posts + sidebar --}}
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    {{!-- Left: post cards --}}
+    <div class="lg:col-span-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5" data-blog-card-grid>
+        {{#foreach posts}}
+          {{> blog-card-index}}
+        {{/foreach}}
+      </div>
 
-  <div class="pt-2">
-    {{pagination}}
+      <div class="pt-4">
+        {{pagination}}
+      </div>
+    </div>
+
+    {{!-- Right: sidebar --}}
+    <aside class="lg:col-span-4 flex flex-col gap-5 lg:sticky lg:top-24 lg:self-start">
+      {{> blog-sidebar}}
+    </aside>
   </div>
 </div>

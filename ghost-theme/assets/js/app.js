@@ -19,7 +19,9 @@ function getTradingViewTheme() {
 }
 
 function getTradingViewBackground() {
-    return getTradingViewTheme() === "light" ? "#ffffff" : "#0f1520";
+    const style = getComputedStyle(document.documentElement);
+    const surface = style.getPropertyValue("--surface").trim();
+    return surface || (getTradingViewTheme() === "light" ? "#ffffff" : "#161b22");
 }
 
 function refreshTradingViewWidgetsForTheme() {
@@ -34,7 +36,8 @@ function refreshTradingViewWidgetsForTheme() {
         "tv-forex-screener-exotic",
         "tv-economic-map",
         "tv-stock-heatmap",
-        "tv-etf-heatmap"
+        "tv-etf-heatmap",
+        "tv-blog-calendar"
     ];
 
     widgetContainerIds.forEach((id) => {
@@ -48,6 +51,7 @@ function refreshTradingViewWidgetsForTheme() {
 
     initGlobalHeaderTicker();
     initHomeMarketOverview();
+    initBlogSidebarWidgets();
     initMarketsPageWidgets();
 }
 
@@ -322,6 +326,105 @@ function initHomeMarketOverview() {
             ]
         }
     );
+}
+
+function initBlogSidebarWidgets() {
+    if (!document.querySelector("[data-view='blog-index']")) {
+        return;
+    }
+
+    mountTradingViewWidget("tv-blog-calendar",
+        "https://s3.tradingview.com/external-embedding/embed-widget-events.js",
+        {
+            width: "100%",
+            height: 350,
+            colorTheme: getTradingViewTheme(),
+            isTransparent: true,
+            locale: "en"
+        }
+    );
+}
+
+function renderSignalsMini(target, payload) {
+    if (!target) {
+        return;
+    }
+
+    while (target.firstChild) {
+        target.removeChild(target.firstChild);
+    }
+
+    const signals = Array.isArray(payload?.data) ? payload.data : [];
+    const activeSignals = signals.filter((s) => {
+        const status = String(s?.status || "active").toLowerCase();
+        return status === "active" && s.locked !== true;
+    }).slice(0, 5);
+
+    if (activeSignals.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "text-muted text-sm text-center py-3";
+        empty.textContent = "No active signals right now";
+        target.appendChild(empty);
+        return;
+    }
+
+    activeSignals.forEach((signal) => {
+        const row = document.createElement("div");
+        row.className = "sidebar-signal-row";
+
+        const dir = (signal.direction || "").toLowerCase();
+        const isBuy = dir === "buy" || dir === "long";
+
+        const arrow = document.createElement("span");
+        arrow.className = isBuy ? "sidebar-signal-row__arrow sidebar-signal-row__arrow--buy" : "sidebar-signal-row__arrow sidebar-signal-row__arrow--sell";
+        arrow.textContent = isBuy ? "↗" : "↘";
+
+        const symbol = document.createElement("span");
+        symbol.className = "sidebar-signal-row__symbol";
+        symbol.textContent = signal.symbol;
+
+        const badge = document.createElement("span");
+        badge.className = isBuy ? "sidebar-signal-row__badge sidebar-signal-row__badge--buy" : "sidebar-signal-row__badge sidebar-signal-row__badge--sell";
+        badge.textContent = signal.direction || (isBuy ? "BUY" : "SELL");
+
+        row.appendChild(arrow);
+        row.appendChild(symbol);
+        row.appendChild(badge);
+        target.appendChild(row);
+    });
+}
+
+function initBlogSearch() {
+    const searchInput = document.querySelector("[data-blog-search]");
+    const cardGrid = document.querySelector("[data-blog-card-grid]");
+    if (!searchInput || !cardGrid) {
+        return;
+    }
+
+    searchInput.addEventListener("input", () => {
+        const query = searchInput.value.toLowerCase().trim();
+        const cards = cardGrid.querySelectorAll("[data-partial='blog-card-index']");
+
+        cards.forEach((card) => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = query === "" || text.includes(query) ? "" : "none";
+        });
+    });
+}
+
+function initBlogCopyLinks() {
+    document.querySelectorAll("[data-copy-url]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const url = btn.getAttribute("data-copy-url");
+            try {
+                await navigator.clipboard.writeText(url);
+                btn.title = "Copied!";
+                setTimeout(() => { btn.title = "Copy link"; }, 1200);
+            } catch (_error) {
+                window.prompt("Copy this link:", url);
+            }
+        });
+    });
 }
 
 function initMarketsPageWidgets() {
@@ -970,6 +1073,12 @@ async function loadData() {
         summaryTargets.forEach((target) => renderSummary(target, summary));
         listTargets.forEach((target) => renderSignals(target, filteredSignals));
 
+        // Render mini sidebar signals
+        document.querySelectorAll("[data-signals-mini]").forEach((target) => {
+            target.querySelectorAll("[data-signals-mini-skeleton]").forEach((el) => el.remove());
+            renderSignalsMini(target, signals);
+        });
+
         // Update subtitle based on tier
         const subtitle = document.getElementById("signals-subtitle");
         if (subtitle) {
@@ -1011,8 +1120,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Widgets first (visual priority)
     initGlobalHeaderTicker();
     initHomeMarketOverview();
+    initBlogSidebarWidgets();
     initMarketsPageWidgets();
     initPostShare();
+    initBlogSearch();
+    initBlogCopyLinks();
 
     // Filter controls
     setupSignalsFilters();

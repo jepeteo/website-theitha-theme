@@ -1,0 +1,50 @@
+{{!-- Blog sidebar: Active Signals, Recent Posts, Economic Calendar --}}
+
+{{!-- Active Signals --}}
+<div class="sidebar-card" data-container="blog-sidebar-signals">
+  <div class="sidebar-card__header">
+    <span class="sidebar-card__dot"></span>
+    <h3 class="sidebar-card__title">Active Signals</h3>
+  </div>
+  <div data-signals-mini class="flex flex-col gap-0">
+    {{!-- JS will populate this with mini signal rows --}}
+    <div class="py-4 text-center text-muted text-sm" data-signals-mini-skeleton>Loading signals…</div>
+  </div>
+  <a href="/signals/" class="sidebar-card__link">View All Signals <span>&rarr;</span></a>
+</div>
+
+{{!-- Recent Posts --}}
+<div class="sidebar-card" data-container="blog-sidebar-recent">
+  <div class="sidebar-card__header">
+    <h3 class="sidebar-card__title">Recent Posts</h3>
+  </div>
+  {{#get "posts" limit="5" include="tags" order="published_at desc"}}
+    <div class="flex flex-col gap-3">
+      {{#foreach posts}}
+        <a href="{{url}}" class="sidebar-post-row group">
+          {{#if feature_image}}
+            <img src="{{feature_image}}" alt="{{title}}" class="sidebar-post-row__img" loading="lazy" />
+          {{else}}
+            <div class="sidebar-post-row__img sidebar-post-row__img--placeholder">
+              <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z"/></svg>
+            </div>
+          {{/if}}
+          <div class="flex flex-col gap-0.5 flex-1 min-w-0">
+            <span class="text-sm font-medium text-text leading-snug line-clamp-2 group-hover:text-primary transition-colors">{{title}}</span>
+            {{#if primary_tag}}
+              <span class="text-xs text-accent font-semibold">{{primary_tag.name}}</span>
+            {{/if}}
+          </div>
+        </a>
+      {{/foreach}}
+    </div>
+  {{/get}}
+</div>
+
+{{!-- Economic Calendar --}}
+<div class="sidebar-card" data-container="blog-sidebar-calendar">
+  <div class="sidebar-card__header">
+    <h3 class="sidebar-card__title">Economic Calendar</h3>
+  </div>
+  <div id="tv-blog-calendar" class="w-full" style="min-height:350px;"></div>
+</div>
