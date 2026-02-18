@@ -61,37 +61,15 @@
     </div>
   </section>
 
-  {{!-- 5) Screener (Major / Minor / Exotics) --}}
-  <section data-container="markets-screener" class="flex flex-col gap-4">
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-      <div class="widget-card">
-        <div class="widget-card__header">
-          <h2 class="text-base font-semibold text-text">Screener — Major</h2>
-          <span class="text-caption">Forex majors</span>
-        </div>
-        <div class="widget-card__body" style="min-height: 500px;">
-          <div id="tv-forex-screener-major" class="w-full"></div>
-        </div>
+  {{!-- 5) Forex Screener --}}
+  <section data-container="markets-screener" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 class="text-base font-semibold text-text">Forex Screener</h2>
+        <span class="text-caption">Filter by Major, Minor &amp; Exotic pairs</span>
       </div>
-
-      <div class="widget-card">
-        <div class="widget-card__header">
-          <h2 class="text-base font-semibold text-text">Screener — Minor</h2>
-          <span class="text-caption">Forex minors</span>
-        </div>
-        <div class="widget-card__body" style="min-height: 500px;">
-          <div id="tv-forex-screener-minor" class="w-full"></div>
-        </div>
-      </div>
-
-      <div class="widget-card">
-        <div class="widget-card__header">
-          <h2 class="text-base font-semibold text-text">Screener — Exotics</h2>
-          <span class="text-caption">Forex exotics</span>
-        </div>
-        <div class="widget-card__body" style="min-height: 500px;">
-          <div id="tv-forex-screener-exotic" class="w-full"></div>
-        </div>
+      <div class="widget-card__body" style="min-height: 550px;">
+        <div id="tv-forex-screener" class="w-full"></div>
       </div>
     </div>
   </section>
@@ -116,7 +94,7 @@
         <h2 class="text-base font-semibold text-text">Stock Heatmap</h2>
         <span class="text-caption">Macro stock view</span>
       </div>
-      <div class="widget-card__body" style="min-height: 520px;">
+      <div class="widget-card__body" style="height: 600px;">
         <div id="tv-stock-heatmap" class="w-full h-full"></div>
       </div>
     </div>
@@ -129,7 +107,7 @@
         <h2 class="text-base font-semibold text-text">ETF Heatmap</h2>
         <span class="text-caption">ETF performance map</span>
       </div>
-      <div class="widget-card__body" style="min-height: 520px;">
+      <div class="widget-card__body" style="height: 600px;">
         <div id="tv-etf-heatmap" class="w-full h-full"></div>
       </div>
     </div>

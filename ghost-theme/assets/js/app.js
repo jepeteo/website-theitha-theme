@@ -31,9 +31,7 @@ function refreshTradingViewWidgetsForTheme() {
         "tv-economic-calendar",
         "tv-forex-heatmap",
         "tv-forex-cross-rates",
-        "tv-forex-screener-major",
-        "tv-forex-screener-minor",
-        "tv-forex-screener-exotic",
+        "tv-forex-screener",
         "tv-economic-map",
         "tv-stock-heatmap",
         "tv-etf-heatmap",
@@ -472,51 +470,19 @@ function initMarketsPageWidgets() {
         }
     );
 
-    mountTradingViewWidget("tv-forex-screener-major",
+    mountTradingViewWidget("tv-forex-screener",
         "https://s3.tradingview.com/external-embedding/embed-widget-screener.js",
         {
             market: "forex",
             showToolbar: true,
             defaultColumn: "overview",
-            defaultScreen: "major",
+            defaultScreen: "general",
             isTransparent: false,
             backgroundColor: getTradingViewBackground(),
             locale: "en",
             colorTheme: getTradingViewTheme(),
             width: "100%",
-            height: 500
-        }
-    );
-
-    mountTradingViewWidget("tv-forex-screener-minor",
-        "https://s3.tradingview.com/external-embedding/embed-widget-screener.js",
-        {
-            market: "forex",
-            showToolbar: true,
-            defaultColumn: "overview",
-            defaultScreen: "minor",
-            isTransparent: false,
-            backgroundColor: getTradingViewBackground(),
-            locale: "en",
-            colorTheme: getTradingViewTheme(),
-            width: "100%",
-            height: 500
-        }
-    );
-
-    mountTradingViewWidget("tv-forex-screener-exotic",
-        "https://s3.tradingview.com/external-embedding/embed-widget-screener.js",
-        {
-            market: "forex",
-            showToolbar: true,
-            defaultColumn: "overview",
-            defaultScreen: "exotic",
-            isTransparent: false,
-            backgroundColor: getTradingViewBackground(),
-            locale: "en",
-            colorTheme: getTradingViewTheme(),
-            width: "100%",
-            height: 500
+            height: 550
         }
     );
 
@@ -547,14 +513,16 @@ function initMarketsPageWidgets() {
             locale: "en",
             symbolUrl: "",
             colorTheme: getTradingViewTheme(),
+            isTransparent: false,
+            backgroundColor: getTradingViewBackground(),
             exchanges: [],
-            hasTopBar: false,
-            isDataSetEnabled: false,
+            hasTopBar: true,
+            isDataSetEnabled: true,
             isZoomEnabled: true,
             hasSymbolTooltip: true,
             isMonoSize: false,
             width: "100%",
-            height: "100%"
+            height: 600
         }
     );
 
@@ -568,13 +536,15 @@ function initMarketsPageWidgets() {
             locale: "en",
             symbolUrl: "",
             colorTheme: getTradingViewTheme(),
-            hasTopBar: false,
-            isDataSetEnabled: false,
+            isTransparent: false,
+            backgroundColor: getTradingViewBackground(),
+            hasTopBar: true,
+            isDataSetEnabled: true,
             isZoomEnabled: true,
             hasSymbolTooltip: true,
             isMonoSize: false,
             width: "100%",
-            height: "100%"
+            height: 600
         }
     );
 }
