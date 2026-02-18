@@ -43,6 +43,82 @@
         --font-mono: "SF Mono", "Fira Code", ui-monospace, SFMono-Regular, monospace;
     }
 
+    html[data-theme="light"] {
+        --bg: #f5f7fb;
+        --surface: #ffffff;
+        --surface2: #eef2f7;
+        --surface3: #e3e9f2;
+        --surface-hover: #d9e2ee;
+        --text: #0f172a;
+        --muted: #475569;
+        --border: #cbd5e1;
+        --accent: #2563eb;
+        --accent-hover: #1d4ed8;
+    }
+
+    html[data-theme="dark"] {
+        --bg: #080b11;
+        --surface: #0f1520;
+        --surface2: #141c2b;
+        --surface3: #1a2336;
+        --surface-hover: #1e2a3d;
+        --text: #e2e8f0;
+        --muted: #64748b;
+        --border: #1e293b;
+        --accent: #d4a017;
+        --accent-hover: #e6b422;
+    }
+
+    html[data-theme="warm"] {
+        --bg: #1a120f;
+        --surface: #261914;
+        --surface2: #311f18;
+        --surface3: #3a251d;
+        --surface-hover: #452d22;
+        --text: #f7efe6;
+        --muted: #c8aa92;
+        --border: #5a3a2c;
+        --accent: #d97841;
+        --accent-hover: #e89056;
+    }
+
+    html[data-theme="forest"] {
+        --bg: #07140d;
+        --surface: #0d1f16;
+        --surface2: #12291d;
+        --surface3: #193425;
+        --surface-hover: #20402d;
+        --text: #dff7e7;
+        --muted: #7ea592;
+        --border: #295540;
+        --accent: #4fd18b;
+        --accent-hover: #67e9a2;
+    }
+
+    html[data-theme="sun"] {
+        --bg: #181327;
+        --surface: #221b35;
+        --surface2: #2b2342;
+        --surface3: #342b50;
+        --surface-hover: #403462;
+        --text: #f3ecff;
+        --muted: #ad9ec9;
+        --border: #4f3e74;
+        --accent: #f3bf4a;
+        --accent-hover: #ffd06a;
+    }
+
+    html[data-theme="light"],
+    html[data-theme="warm"] {
+        color-scheme: light;
+    }
+
+    html[data-theme="dark"],
+    html[data-theme="forest"],
+    html[data-theme="sun"] {
+        color-scheme: dark;
+    }
+
     html,
     body {
         background-color: var(--bg);
@@ -286,6 +362,35 @@
     .nav-inline .nav a:hover {
         color: var(--text);
         background-color: var(--surface2);
+    }
+
+    .theme-switcher {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .theme-select {
+        border: 1px solid var(--border);
+        background-color: var(--surface);
+        color: var(--text);
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        line-height: 1.2;
+        padding: 0.4rem 1.8rem 0.4rem 0.65rem;
+        cursor: pointer;
+        transition: border-color 0.15s, color 0.15s;
+        appearance: none;
+        background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+        background-position: calc(100% - 14px) calc(50% - 2px), calc(100% - 9px) calc(50% - 2px);
+        background-size: 5px 5px, 5px 5px;
+        background-repeat: no-repeat;
+    }
+
+    .theme-select:hover,
+    .theme-select:focus {
+        border-color: var(--accent);
+        outline: none;
     }
 
     .nav-inline .nav .nav-current a {

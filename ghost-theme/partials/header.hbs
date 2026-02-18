@@ -32,6 +32,17 @@
         </div>
       </nav>
 
+      <div class="theme-switcher" aria-label="Theme switcher">
+        <label for="theme-select-desktop" class="sr-only">Select theme</label>
+        <select id="theme-select-desktop" class="theme-select" data-theme-select>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="warm">Warm</option>
+          <option value="forest">Forest</option>
+          <option value="sun">Sun</option>
+        </select>
+      </div>
+
       {{#if @member}}
         <div class="flex items-center gap-2">
           <a href="#/portal/account" data-portal="account" class="btn-outline text-xs px-3 py-1.5">Account</a>
@@ -68,6 +79,18 @@
       <div class="px-3 pt-2 pb-1 text-caption text-xs uppercase tracking-wide">Links</div>
       <a href="https://christosmentis.substack.com/" target="_blank" rel="noopener noreferrer" class="nav-link pl-5">Substack</a>
       <a href="https://www.amazon.com/dp/B0GLF3H5FV" target="_blank" rel="noopener noreferrer" class="nav-link pl-5">Forex Blueprint Series</a>
+
+      <div class="px-3 pt-2 pb-1 text-caption text-xs uppercase tracking-wide">Theme</div>
+      <div class="px-3 pb-1">
+        <label for="theme-select-mobile" class="sr-only">Select theme</label>
+        <select id="theme-select-mobile" class="theme-select w-full" data-theme-select>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="warm">Warm</option>
+          <option value="forest">Forest</option>
+          <option value="sun">Sun</option>
+        </select>
+      </div>
 
       <div class="pt-2">
         {{#if @member}}

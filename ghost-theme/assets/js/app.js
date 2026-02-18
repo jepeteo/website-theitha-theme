@@ -10,6 +10,51 @@ const signalsFilterState = {
     market: "all"
 };
 
+const THEME_STORAGE_KEY = "theitha-theme";
+const SUPPORTED_THEMES = ["light", "dark", "warm", "forest", "sun"];
+
+function getStoredTheme() {
+    try {
+        const theme = localStorage.getItem(THEME_STORAGE_KEY);
+        if (SUPPORTED_THEMES.includes(theme)) {
+            return theme;
+        }
+    } catch (_error) {
+        // ignore storage access issues
+    }
+    return "dark";
+}
+
+function applyTheme(theme) {
+    const normalizedTheme = SUPPORTED_THEMES.includes(theme) ? theme : "dark";
+    document.documentElement.setAttribute("data-theme", normalizedTheme);
+
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, normalizedTheme);
+    } catch (_error) {
+        // ignore storage access issues
+    }
+
+    document.querySelectorAll("[data-theme-select]").forEach((select) => {
+        if (select.value !== normalizedTheme) {
+            select.value = normalizedTheme;
+        }
+    });
+}
+
+function initThemeSwitcher() {
+    const initialTheme = getStoredTheme();
+    applyTheme(initialTheme);
+
+    document.querySelectorAll("[data-theme-select]").forEach((select) => {
+        select.value = initialTheme;
+        select.addEventListener("change", (event) => {
+            const nextTheme = event.target.value;
+            applyTheme(nextTheme);
+        });
+    });
+}
+
 function looksLikeJwt(value) {
     return typeof value === "string" && value.split(".").length === 3;
 }
@@ -917,6 +962,8 @@ async function loadData() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    initThemeSwitcher();
+
     // Widgets first (visual priority)
     initGlobalHeaderTicker();
     initHomeMarketOverview();

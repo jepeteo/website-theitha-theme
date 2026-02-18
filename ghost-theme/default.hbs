@@ -4,6 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{meta_title}}</title>
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem("theitha-theme");
+        var allowedThemes = ["light", "dark", "warm", "forest", "sun"];
+        var theme = allowedThemes.indexOf(storedTheme) > -1 ? storedTheme : "dark";
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (_error) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    })();
+  </script>
   {{ghost_head}}
   <link rel="stylesheet" href="{{asset "css/screen.css"}}" />
   <script>
