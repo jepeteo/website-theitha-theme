@@ -9,19 +9,11 @@
     <p class="text-muted text-base max-w-lg">Live charts, quotes, and economic calendar.</p>
   </section>
 
-  {{!-- Market category chips (visual parity with demo) --}}
-  <section aria-label="Market categories" class="flex flex-wrap items-center justify-center gap-2" data-markets-filters>
-    <button type="button" class="demo-chip demo-chip--active" data-market="forex">Forex</button>
-    <button type="button" class="demo-chip" data-market="commodities">Commodities</button>
-    <button type="button" class="demo-chip" data-market="crypto">Crypto</button>
-    <button type="button" class="demo-chip" data-market="indices">Indices</button>
-  </section>
-
-  {{!-- Market Overview --}}
+  {{!-- 1) Market Overview --}}
   <section data-container="markets-overview" class="flex flex-col gap-3">
     <div class="widget-card">
       <div class="widget-card__header">
-        <h2 class="text-base font-semibold text-text">Market Quotes</h2>
+        <h2 class="text-base font-semibold text-text">Market Overview</h2>
         <span class="text-caption">Real-time quotes</span>
       </div>
       <div class="widget-card__body widget-card__body--market-overview">
@@ -30,20 +22,7 @@
     </div>
   </section>
 
-  {{!-- Advanced Chart --}}
-  <section data-container="markets-chart" class="flex flex-col gap-3">
-    <div class="widget-card">
-      <div class="widget-card__header">
-        <h2 class="text-base font-semibold text-text">Advanced Chart</h2>
-        <span class="text-caption">Multi-asset chart</span>
-      </div>
-      <div class="widget-card__body" style="min-height: 550px;">
-        <div id="tv-advanced-chart" class="w-full"></div>
-      </div>
-    </div>
-  </section>
-
-  {{!-- Economic Calendar --}}
+  {{!-- 2) Economic Calendar --}}
   <section data-container="markets-calendar" class="flex flex-col gap-3">
     <div class="widget-card">
       <div class="widget-card__header">
@@ -52,6 +31,106 @@
       </div>
       <div class="widget-card__body" style="min-height: 500px;">
         <div id="tv-economic-calendar" class="w-full"></div>
+      </div>
+    </div>
+  </section>
+
+  {{!-- 3) Forex Heatmap --}}
+  <section data-container="markets-forex-heatmap" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 class="text-base font-semibold text-text">Forex Heatmap</h2>
+        <span class="text-caption">Currency strength map</span>
+      </div>
+      <div class="widget-card__body" style="min-height: 420px;">
+        <div id="tv-forex-heatmap" class="w-full"></div>
+      </div>
+    </div>
+  </section>
+
+  {{!-- 4) Forex Cross Rates --}}
+  <section data-container="markets-forex-cross-rates" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 class="text-base font-semibold text-text">Forex Cross Rates</h2>
+        <span class="text-caption">Live cross-rate matrix</span>
+      </div>
+      <div class="widget-card__body" style="min-height: 420px;">
+        <div id="tv-forex-cross-rates" class="w-full"></div>
+      </div>
+    </div>
+  </section>
+
+  {{!-- 5) Screener (Major / Minor / Exotics) --}}
+  <section data-container="markets-screener" class="flex flex-col gap-4">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+      <div class="widget-card">
+        <div class="widget-card__header">
+          <h2 class="text-base font-semibold text-text">Screener — Major</h2>
+          <span class="text-caption">Forex majors</span>
+        </div>
+        <div class="widget-card__body" style="min-height: 500px;">
+          <div id="tv-forex-screener-major" class="w-full"></div>
+        </div>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-card__header">
+          <h2 class="text-base font-semibold text-text">Screener — Minor</h2>
+          <span class="text-caption">Forex minors</span>
+        </div>
+        <div class="widget-card__body" style="min-height: 500px;">
+          <div id="tv-forex-screener-minor" class="w-full"></div>
+        </div>
+      </div>
+
+      <div class="widget-card">
+        <div class="widget-card__header">
+          <h2 class="text-base font-semibold text-text">Screener — Exotics</h2>
+          <span class="text-caption">Forex exotics</span>
+        </div>
+        <div class="widget-card__body" style="min-height: 500px;">
+          <div id="tv-forex-screener-exotic" class="w-full"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{!-- 6) Economic Map --}}
+  <section data-container="markets-economic-map" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 class="text-base font-semibold text-text">Economic Map</h2>
+        <span class="text-caption">Global macro map</span>
+      </div>
+      <div class="widget-card__body" style="min-height: 520px;">
+        <div id="tv-economic-map" class="w-full h-full"></div>
+      </div>
+    </div>
+  </section>
+
+  {{!-- 7) Stock Heatmap --}}
+  <section data-container="markets-stock-heatmap" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 class="text-base font-semibold text-text">Stock Heatmap</h2>
+        <span class="text-caption">Macro stock view</span>
+      </div>
+      <div class="widget-card__body" style="min-height: 520px;">
+        <div id="tv-stock-heatmap" class="w-full h-full"></div>
+      </div>
+    </div>
+  </section>
+
+  {{!-- 8) ETF Heatmap --}}
+  <section data-container="markets-etf-heatmap" class="flex flex-col gap-3">
+    <div class="widget-card">
+      <div class="widget-card__header">
+        <h2 class="text-base font-semibold text-text">ETF Heatmap</h2>
+        <span class="text-caption">ETF performance map</span>
+      </div>
+      <div class="widget-card__body" style="min-height: 520px;">
+        <div id="tv-etf-heatmap" class="w-full h-full"></div>
       </div>
     </div>
   </section>

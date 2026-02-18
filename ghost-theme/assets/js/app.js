@@ -10,13 +10,6 @@ const signalsFilterState = {
     market: "all"
 };
 
-const marketChartSymbols = {
-    forex: "FX:EURUSD",
-    commodities: "OANDA:XAUUSD",
-    crypto: "BITSTAMP:BTCUSD",
-    indices: "FOREXCOM:US30"
-};
-
 function looksLikeJwt(value) {
     return typeof value === "string" && value.split(".").length === 3;
 }
@@ -248,31 +241,6 @@ function initMarketsPageWidgets() {
         return;
     }
 
-    const renderAdvancedChart = (symbol) => {
-        const container = document.getElementById("tv-advanced-chart");
-        if (!container) {
-            return;
-        }
-
-        container.innerHTML = "";
-        delete container.dataset.tvInitialized;
-
-        mountTradingViewWidget("tv-advanced-chart",
-            "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js",
-            {
-                symbol,
-                width: "100%",
-                height: 550,
-                theme: "dark",
-                isTransparent: true,
-                locale: "en",
-                autosize: false
-            }
-        );
-    };
-
-    renderAdvancedChart(marketChartSymbols.forex);
-
     mountTradingViewWidget("tv-economic-calendar",
         "https://s3.tradingview.com/external-embedding/embed-widget-events.js",
         {
@@ -284,18 +252,133 @@ function initMarketsPageWidgets() {
         }
     );
 
-    const marketButtons = Array.from(document.querySelectorAll("[data-markets-filters] [data-market]"));
-    marketButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const market = button.getAttribute("data-market") || "forex";
-            const symbol = marketChartSymbols[market] || marketChartSymbols.forex;
+    mountTradingViewWidget("tv-forex-heatmap",
+        "https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js",
+        {
+            colorTheme: "dark",
+            isTransparent: true,
+            locale: "en",
+            currencies: ["EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD", "CNY"],
+            backgroundColor: "#0f1520",
+            width: "100%",
+            height: 420
+        }
+    );
 
-            marketButtons.forEach((item) => item.classList.remove("demo-chip--active"));
-            button.classList.add("demo-chip--active");
+    mountTradingViewWidget("tv-forex-cross-rates",
+        "https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js",
+        {
+            colorTheme: "dark",
+            isTransparent: true,
+            locale: "en",
+            currencies: ["EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD", "CNY"],
+            backgroundColor: "#0f1520",
+            width: "100%",
+            height: 420
+        }
+    );
 
-            renderAdvancedChart(symbol);
-        });
-    });
+    mountTradingViewWidget("tv-forex-screener-major",
+        "https://s3.tradingview.com/external-embedding/embed-widget-screener.js",
+        {
+            market: "forex",
+            showToolbar: true,
+            defaultColumn: "overview",
+            defaultScreen: "major",
+            isTransparent: true,
+            locale: "en",
+            colorTheme: "dark",
+            width: "100%",
+            height: 500
+        }
+    );
+
+    mountTradingViewWidget("tv-forex-screener-minor",
+        "https://s3.tradingview.com/external-embedding/embed-widget-screener.js",
+        {
+            market: "forex",
+            showToolbar: true,
+            defaultColumn: "overview",
+            defaultScreen: "minor",
+            isTransparent: true,
+            locale: "en",
+            colorTheme: "dark",
+            width: "100%",
+            height: 500
+        }
+    );
+
+    mountTradingViewWidget("tv-forex-screener-exotic",
+        "https://s3.tradingview.com/external-embedding/embed-widget-screener.js",
+        {
+            market: "forex",
+            showToolbar: true,
+            defaultColumn: "overview",
+            defaultScreen: "exotic",
+            isTransparent: true,
+            locale: "en",
+            colorTheme: "dark",
+            width: "100%",
+            height: 500
+        }
+    );
+
+    const economicMapContainer = document.getElementById("tv-economic-map");
+    if (economicMapContainer && economicMapContainer.dataset.tvInitialized !== "true") {
+        const mapScript = document.createElement("script");
+        mapScript.type = "module";
+        mapScript.src = "https://widgets.tradingview-widget.com/w/en/tv-economic-map.js";
+
+        const mapElement = document.createElement("tv-economic-map");
+        mapElement.style.display = "block";
+        mapElement.style.width = "100%";
+        mapElement.style.height = "520px";
+
+        economicMapContainer.appendChild(mapScript);
+        economicMapContainer.appendChild(mapElement);
+        economicMapContainer.dataset.tvInitialized = "true";
+    }
+
+    mountTradingViewWidget("tv-stock-heatmap",
+        "https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js",
+        {
+            dataSource: "SPX500",
+            blockSize: "market_cap_basic",
+            blockColor: "change",
+            grouping: "sector",
+            locale: "en",
+            symbolUrl: "",
+            colorTheme: "dark",
+            exchanges: [],
+            hasTopBar: false,
+            isDataSetEnabled: false,
+            isZoomEnabled: true,
+            hasSymbolTooltip: true,
+            isMonoSize: false,
+            width: "100%",
+            height: "100%"
+        }
+    );
+
+    mountTradingViewWidget("tv-etf-heatmap",
+        "https://s3.tradingview.com/external-embedding/embed-widget-etf-heatmap.js",
+        {
+            dataSource: "AllUSEtf",
+            blockSize: "volume",
+            blockColor: "change",
+            grouping: "asset_class",
+            locale: "en",
+            symbolUrl: "",
+            colorTheme: "dark",
+            hasTopBar: false,
+            isDataSetEnabled: false,
+            isZoomEnabled: true,
+            hasSymbolTooltip: true,
+            isMonoSize: false,
+            width: "100%",
+            height: "100%"
+        }
+    );
 }
 
 /**
