@@ -286,7 +286,7 @@ function initHomeMarketOverview() {
             colorTheme: getTradingViewTheme(),
             locale: "en",
             largeChartUrl: "https://www.tradingview.com/chart/",
-            isTransparent: true,
+            isTransparent: false,
             showSymbolLogo: true,
             backgroundColor: getTradingViewBackground(),
             support_host: "https://www.tradingview.com",
@@ -339,7 +339,8 @@ function initBlogSidebarWidgets() {
             width: "100%",
             height: 350,
             colorTheme: getTradingViewTheme(),
-            isTransparent: true,
+            isTransparent: false,
+            backgroundColor: getTradingViewBackground(),
             locale: "en"
         }
     );
@@ -438,7 +439,8 @@ function initMarketsPageWidgets() {
             width: "100%",
             height: 500,
             colorTheme: getTradingViewTheme(),
-            isTransparent: true,
+            isTransparent: false,
+            backgroundColor: getTradingViewBackground(),
             locale: "en"
         }
     );
@@ -447,7 +449,7 @@ function initMarketsPageWidgets() {
         "https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js",
         {
             colorTheme: getTradingViewTheme(),
-            isTransparent: true,
+            isTransparent: false,
             locale: "en",
             currencies: ["EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD", "CNY"],
             backgroundColor: getTradingViewBackground(),
@@ -460,7 +462,7 @@ function initMarketsPageWidgets() {
         "https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js",
         {
             colorTheme: getTradingViewTheme(),
-            isTransparent: true,
+            isTransparent: false,
             locale: "en",
             currencies: ["EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD", "CNY"],
             backgroundColor: getTradingViewBackground(),
@@ -476,7 +478,8 @@ function initMarketsPageWidgets() {
             showToolbar: true,
             defaultColumn: "overview",
             defaultScreen: "major",
-            isTransparent: true,
+            isTransparent: false,
+            backgroundColor: getTradingViewBackground(),
             locale: "en",
             colorTheme: getTradingViewTheme(),
             width: "100%",
@@ -491,7 +494,8 @@ function initMarketsPageWidgets() {
             showToolbar: true,
             defaultColumn: "overview",
             defaultScreen: "minor",
-            isTransparent: true,
+            isTransparent: false,
+            backgroundColor: getTradingViewBackground(),
             locale: "en",
             colorTheme: getTradingViewTheme(),
             width: "100%",
@@ -506,7 +510,8 @@ function initMarketsPageWidgets() {
             showToolbar: true,
             defaultColumn: "overview",
             defaultScreen: "exotic",
-            isTransparent: true,
+            isTransparent: false,
+            backgroundColor: getTradingViewBackground(),
             locale: "en",
             colorTheme: getTradingViewTheme(),
             width: "100%",
