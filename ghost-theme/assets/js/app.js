@@ -267,9 +267,10 @@ function initGlobalHeaderTicker() {
                 { proName: "BITSTAMP:BTCUSD", title: "BTCUSD" }
             ],
             showSymbolLogo: true,
-            isTransparent: true,
+            isTransparent: false,
             displayMode: "adaptive",
             colorTheme: getTradingViewTheme(),
+            backgroundColor: getTradingViewBackground(),
             locale: "en"
         }
     );
