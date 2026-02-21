@@ -1,92 +1,103 @@
 {{!< default}}
 
 <div data-view="signals" class="py-8 flex flex-col gap-8">
-  {{!-- Page header --}}
-  <section aria-labelledby="signals-title" class="flex flex-col items-center text-center gap-3">
-    <h1 id="signals-title" class="text-3xl md:text-4xl font-bold tracking-tight">
-      Trading <span class="text-primary">Signals</span>
-    </h1>
-    <p id="signals-subtitle" class="text-muted text-base max-w-lg">Real-time trading signals with entry, SL, and TP levels.</p>
-  </section>
-
-  {{!-- Summary stats --}}
-  <section aria-labelledby="signals-summary-title" class="flex flex-col gap-3">
-    <h2 id="signals-summary-title" class="section-title">Overview</h2>
-    <div data-container="signals-summary" data-signals-summary class="card-muted p-5 rounded-xl">
-      <div class="grid grid-cols-3 gap-4 text-center" data-signals-skeleton>
-        <div class="flex flex-col gap-2 items-center">
-          <span class="skeleton-bar w-10 h-5"></span>
-          <span class="text-caption">Active</span>
-        </div>
-        <div class="flex flex-col gap-2 items-center">
-          <span class="skeleton-bar w-10 h-5"></span>
-          <span class="text-caption">Winners</span>
-        </div>
-        <div class="flex flex-col gap-2 items-center">
-          <span class="skeleton-bar w-10 h-5"></span>
-          <span class="text-caption">Total</span>
-        </div>
+  {{!-- Page header with inline stats --}}
+  <section aria-labelledby="signals-title" class="signals-hero">
+    <div class="signals-hero__left">
+      <h1 id="signals-title" class="signals-hero__title">
+        <span class="signals-hero__icon">⚡</span>
+        Trading Signals
+      </h1>
+      <p id="signals-subtitle" class="text-muted text-sm md:text-base">Real-time trading signals with entry, SL, and TP levels.</p>
+    </div>
+    <div data-signals-summary class="signals-hero__stats">
+      <div class="signals-stat" data-signals-skeleton>
+        <span class="signals-stat__value skeleton-bar w-8 h-6">&nbsp;</span>
+        <span class="signals-stat__label">Active</span>
+      </div>
+      <div class="signals-stat" data-signals-skeleton>
+        <span class="signals-stat__value skeleton-bar w-8 h-6">&nbsp;</span>
+        <span class="signals-stat__label">Winners</span>
+      </div>
+      <div class="signals-stat" data-signals-skeleton>
+        <span class="signals-stat__value skeleton-bar w-8 h-6">&nbsp;</span>
+        <span class="signals-stat__label">Total</span>
       </div>
     </div>
+  </section>
 
-    {{!-- Visual status filters (demo parity) --}}
+  {{!-- Filters --}}
+  <section class="flex flex-col gap-3">
+    {{!-- Status filters --}}
     <div class="flex flex-wrap items-center gap-2" data-signals-status-filters>
       <button type="button" class="demo-chip demo-chip--active" data-filter-type="status" data-filter-value="all">All</button>
       <button type="button" class="demo-chip" data-filter-type="status" data-filter-value="active">Active</button>
-      <button type="button" class="demo-chip" data-filter-type="status" data-filter-value="won">Hit TP</button>
+      <button type="button" class="demo-chip" data-filter-type="status" data-filter-value="tp1">Hit TP1</button>
+      <button type="button" class="demo-chip" data-filter-type="status" data-filter-value="tp2">Hit TP2</button>
       <button type="button" class="demo-chip" data-filter-type="status" data-filter-value="lost">Stopped</button>
     </div>
 
-    {{!-- Visual market filters (demo parity) --}}
+    {{!-- Market filters --}}
     <div class="flex flex-wrap items-center gap-2" data-signals-market-filters>
-      <button type="button" class="demo-chip demo-chip--active" data-filter-type="market" data-filter-value="all">All Markets</button>
-      <button type="button" class="demo-chip" data-filter-type="market" data-filter-value="forex">Forex</button>
-      <button type="button" class="demo-chip" data-filter-type="market" data-filter-value="commodities">Commodities</button>
-      <button type="button" class="demo-chip" data-filter-type="market" data-filter-value="crypto">Crypto</button>
-      <button type="button" class="demo-chip" data-filter-type="market" data-filter-value="indices">Indices</button>
+      <button type="button" class="demo-chip demo-chip--market demo-chip--active" data-filter-type="market" data-filter-value="all">All Markets</button>
+      <button type="button" class="demo-chip demo-chip--market" data-filter-type="market" data-filter-value="forex">Forex</button>
+      <button type="button" class="demo-chip demo-chip--market" data-filter-type="market" data-filter-value="commodities">Commodities</button>
+      <button type="button" class="demo-chip demo-chip--market" data-filter-type="market" data-filter-value="crypto">Crypto</button>
+      <button type="button" class="demo-chip demo-chip--market" data-filter-type="market" data-filter-value="indices">Indices</button>
     </div>
   </section>
 
   {{!-- Signals grid --}}
-  <section aria-labelledby="signals-list-title" class="flex flex-col gap-4">
-    <h2 id="signals-list-title" class="section-title">Active Signals</h2>
+  <section aria-labelledby="signals-list-title">
     <div data-container="signals-list" data-signals-list class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {{!-- Skeleton cards --}}
       <div class="card-signal skeleton-card" data-signals-skeleton>
         <div class="flex items-center justify-between mb-3">
-          <span class="skeleton-bar w-20 h-4"></span>
-          <span class="skeleton-bar w-12 h-4 rounded-full"></span>
+          <div class="flex items-center gap-2">
+            <span class="skeleton-bar w-8 h-8 rounded-full"></span>
+            <span class="skeleton-bar w-20 h-4"></span>
+          </div>
+          <span class="skeleton-bar w-16 h-5 rounded-full"></span>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <span class="skeleton-bar w-full h-3"></span>
-          <span class="skeleton-bar w-full h-3"></span>
-          <span class="skeleton-bar w-full h-3"></span>
-          <span class="skeleton-bar w-full h-3"></span>
+        <div class="grid grid-cols-2 gap-2 mb-3">
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
         </div>
+        <span class="skeleton-bar w-3/4 h-3"></span>
       </div>
       <div class="card-signal skeleton-card hidden md:block" data-signals-skeleton>
         <div class="flex items-center justify-between mb-3">
-          <span class="skeleton-bar w-20 h-4"></span>
-          <span class="skeleton-bar w-12 h-4 rounded-full"></span>
+          <div class="flex items-center gap-2">
+            <span class="skeleton-bar w-8 h-8 rounded-full"></span>
+            <span class="skeleton-bar w-20 h-4"></span>
+          </div>
+          <span class="skeleton-bar w-16 h-5 rounded-full"></span>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <span class="skeleton-bar w-full h-3"></span>
-          <span class="skeleton-bar w-full h-3"></span>
-          <span class="skeleton-bar w-full h-3"></span>
-          <span class="skeleton-bar w-full h-3"></span>
+        <div class="grid grid-cols-2 gap-2 mb-3">
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
         </div>
+        <span class="skeleton-bar w-3/4 h-3"></span>
       </div>
       <div class="card-signal skeleton-card hidden lg:block" data-signals-skeleton>
         <div class="flex items-center justify-between mb-3">
-          <span class="skeleton-bar w-20 h-4"></span>
-          <span class="skeleton-bar w-12 h-4 rounded-full"></span>
+          <div class="flex items-center gap-2">
+            <span class="skeleton-bar w-8 h-8 rounded-full"></span>
+            <span class="skeleton-bar w-20 h-4"></span>
+          </div>
+          <span class="skeleton-bar w-16 h-5 rounded-full"></span>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <span class="skeleton-bar w-full h-3"></span>
-          <span class="skeleton-bar w-full h-3"></span>
-          <span class="skeleton-bar w-full h-3"></span>
-          <span class="skeleton-bar w-full h-3"></span>
+        <div class="grid grid-cols-2 gap-2 mb-3">
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
+          <span class="skeleton-bar w-full h-14 rounded-lg"></span>
         </div>
+        <span class="skeleton-bar w-3/4 h-3"></span>
       </div>
     </div>
   </section>

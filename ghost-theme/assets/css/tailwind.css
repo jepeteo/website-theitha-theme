@@ -225,26 +225,351 @@
         padding: 1.25rem;
     }
 
-    /* ── Signal card direction variants ── */
+    /* ══════════════════════════════════════════════════════
+       SIGNALS HERO — page header with inline stats
+       ══════════════════════════════════════════════════════ */
+    .signals-hero {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    @media (min-width: 768px) {
+        .signals-hero {
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+    }
+
+    .signals-hero__title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .signals-hero__icon {
+        font-size: 1.5rem;
+    }
+
+    .signals-hero__stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .signals-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        min-width: 3.5rem;
+    }
+
+    .signals-stat__value {
+        font-family: var(--font-mono);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+    }
+
+    .signals-stat--active .signals-stat__value { color: var(--success); }
+    .signals-stat--won .signals-stat__value { color: var(--accent); }
+
+    .signals-stat__label {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       SIGNAL CARD — TradeVision-style card
+       ══════════════════════════════════════════════════════ */
+    .sc-card {
+        background-color: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0.875rem;
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .sc-card:hover {
+        transform: translateY(-2px);
+        border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* ── Header ── */
+    .sc-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    .sc-symbol-group {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+    }
+
+    .sc-icon {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        border: 1px solid transparent;
+    }
+
+    .sc-icon--gold   { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
+    .sc-icon--silver  { background: rgba(156, 163, 175, 0.12); color: #9ca3af; border-color: rgba(156, 163, 175, 0.2); }
+    .sc-icon--btc     { background: rgba(247, 147, 26, 0.12); color: #f7931a; border-color: rgba(247, 147, 26, 0.2); }
+    .sc-icon--eth     { background: rgba(98, 126, 234, 0.12); color: #627eea; border-color: rgba(98, 126, 234, 0.2); }
+    .sc-icon--sol     { background: rgba(153, 69, 255, 0.12); color: #9945ff; border-color: rgba(153, 69, 255, 0.2); }
+    .sc-icon--oil     { background: rgba(107, 114, 128, 0.12); color: #6b7280; border-color: rgba(107, 114, 128, 0.2); }
+    .sc-icon--forex   { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border-color: rgba(59, 130, 246, 0.2); }
+    .sc-icon--locked  { background: rgba(107, 114, 128, 0.12); color: #6b7280; border-color: rgba(107, 114, 128, 0.2); font-size: 0.875rem; }
+
+    .sc-name-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+
+    .sc-symbol {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+    }
+
+    .sc-dir {
+        font-size: 0.625rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .sc-dir--buy  { color: var(--success); }
+    .sc-dir--sell { color: var(--danger); }
+
+    /* ── Status Badges ── */
+    .sc-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.625rem;
+        border-radius: 9999px;
+        font-size: 0.625rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border: 1px solid transparent;
+    }
+
+    .sc-status--active {
+        background-color: color-mix(in srgb, var(--success) 12%, transparent);
+        color: var(--success);
+        border-color: color-mix(in srgb, var(--success) 25%, transparent);
+    }
+
+    .sc-status--tp1 {
+        background-color: rgba(245, 158, 11, 0.12);
+        color: #f59e0b;
+        border-color: rgba(245, 158, 11, 0.25);
+    }
+
+    .sc-status--won {
+        background-color: color-mix(in srgb, var(--accent) 12%, transparent);
+        color: var(--accent);
+        border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+    }
+
+    .sc-status--stopped {
+        background-color: color-mix(in srgb, var(--danger) 12%, transparent);
+        color: var(--danger);
+        border-color: color-mix(in srgb, var(--danger) 25%, transparent);
+    }
+
+    .sc-status--locked {
+        background-color: color-mix(in srgb, var(--muted) 12%, transparent);
+        color: var(--muted);
+        border-color: color-mix(in srgb, var(--muted) 25%, transparent);
+    }
+
+    /* ── Price Grid (2×2) ── */
+    .sc-prices {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .sc-price {
+        border-radius: 0.5rem;
+        padding: 0.625rem 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        border: 1px solid transparent;
+    }
+
+    .sc-price__label {
+        font-size: 0.625rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        opacity: 0.8;
+    }
+
+    .sc-price__value {
+        font-family: var(--font-mono);
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.2;
+    }
+
+    .sc-price--entry {
+        background-color: color-mix(in srgb, var(--surface3) 80%, transparent);
+        border-color: var(--border);
+    }
+
+    .sc-price--sl {
+        background-color: color-mix(in srgb, var(--danger) 8%, transparent);
+        border-color: color-mix(in srgb, var(--danger) 15%, transparent);
+    }
+    .sc-price--sl .sc-price__label { color: var(--danger); opacity: 0.7; }
+    .sc-price--sl .sc-price__value { color: var(--danger); }
+
+    .sc-price--tp {
+        background-color: color-mix(in srgb, var(--success) 8%, transparent);
+        border-color: color-mix(in srgb, var(--success) 15%, transparent);
+    }
+    .sc-price--tp .sc-price__label { color: var(--success); opacity: 0.7; }
+    .sc-price--tp .sc-price__value { color: var(--success); }
+
+    .sc-price--tp2 {
+        background-color: color-mix(in srgb, var(--success) 5%, transparent);
+        border-color: color-mix(in srgb, var(--success) 10%, transparent);
+    }
+    .sc-price--tp2 .sc-price__label { color: var(--success); opacity: 0.5; }
+    .sc-price--tp2 .sc-price__value { color: var(--success); opacity: 0.85; }
+
+    .sc-price--hit {
+        background-color: color-mix(in srgb, var(--success) 15%, transparent);
+        border-color: color-mix(in srgb, var(--success) 30%, transparent);
+    }
+    .sc-price--hit .sc-price__label { color: var(--success); opacity: 1; font-weight: 700; }
+    .sc-price--hit .sc-price__value { color: var(--success); font-weight: 800; }
+
+    /* ── Description ── */
+    .sc-desc {
+        font-size: 0.8125rem;
+        line-height: 1.5;
+        color: var(--muted);
+    }
+
+    /* ── Footer ── */
+    .sc-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding-top: 0.625rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .sc-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .sc-tf {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--muted);
+        background-color: var(--surface3);
+        padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem;
+    }
+
+    .sc-rr {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--accent);
+    }
+
+    .sc-date {
+        font-size: 0.6875rem;
+        color: var(--muted);
+    }
+
+    /* ── Share Buttons ── */
+    .sc-share {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .sc-share__btn {
+        width: 1.5rem;
+        height: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.25rem;
+        color: var(--muted);
+        opacity: 0.5;
+        transition: opacity 0.15s, color 0.15s, background-color 0.15s;
+    }
+
+    .sc-share__btn:hover {
+        opacity: 1;
+        color: var(--text);
+        background-color: color-mix(in srgb, var(--text) 8%, transparent);
+    }
+
+    .sc-share__btn--copied {
+        opacity: 1;
+        color: var(--success);
+    }
+
+    .sc-share__icon {
+        width: 0.875rem;
+        height: 0.875rem;
+    }
+
+    /* ── Legacy compat: keep card-signal for skeleton / locked ── */
     .card-signal {
         background-color: var(--surface);
         border: 1px solid var(--border);
-        border-left: 3px solid var(--muted);
-        border-radius: 0.75rem;
+        border-radius: 0.875rem;
         padding: 1.25rem;
-        transition: transform 0.2s, border-color 0.2s;
-    }
-
-    .card-signal:hover {
-        transform: translateY(-2px);
     }
 
     .card-signal--buy {
-        border-left-color: var(--success);
+        border-left: 3px solid var(--success);
     }
 
     .card-signal--sell {
-        border-left-color: var(--danger);
+        border-left: 3px solid var(--danger);
     }
 
     /* ── Badge pills ── */
@@ -1051,10 +1376,10 @@
         background-color: var(--danger);
     }
 
-    /* ── Signal data grid (3-col for Entry / SL / TP) ── */
+    /* ── Signal data grid (legacy — kept for sidebar/partial) ── */
     .signal-data-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 0.5rem;
         padding-top: 0.75rem;
         border-top: 1px solid var(--border);
@@ -1408,7 +1733,7 @@
         }
 
         .signal-data-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 0.25rem;
         }
 

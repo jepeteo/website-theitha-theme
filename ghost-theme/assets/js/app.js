@@ -664,8 +664,23 @@ function applySignalsFilters(payload) {
     const filtered = signals.filter((signal) => {
         const statusValue = String(signal?.status || "active").toLowerCase();
         const marketValue = classifySignalMarket(signal?.symbol);
+        const filterStatus = signalsFilterState.status;
 
-        const statusPass = signalsFilterState.status === "all" || statusValue === signalsFilterState.status;
+        let statusPass = false;
+        if (filterStatus === "all") {
+            statusPass = true;
+        } else if (filterStatus === "active") {
+            statusPass = statusValue === "active" && !signal.tp1HitAt;
+        } else if (filterStatus === "tp1") {
+            statusPass = statusValue === "active" && !!signal.tp1HitAt;
+        } else if (filterStatus === "tp2") {
+            statusPass = statusValue === "won";
+        } else if (filterStatus === "lost") {
+            statusPass = statusValue === "lost";
+        } else {
+            statusPass = statusValue === filterStatus;
+        }
+
         const marketPass = signalsFilterState.market === "all" || marketValue === signalsFilterState.market;
 
         return statusPass && marketPass;
@@ -833,45 +848,149 @@ function renderSummary(target, summary) {
 
     clearNode(target);
 
-    const grid = document.createElement("div");
-    grid.className = "grid grid-cols-3 gap-4 text-center";
-
     const active = Number(summary?.activeSignals ?? summary?.active ?? 0);
     const winners = Number(summary?.wonSignals ?? summary?.winners ?? 0);
     const lost = Number(summary?.lostSignals ?? summary?.lost ?? 0);
     const total = active + winners + lost;
 
     const stats = [
-        { label: "Active", value: active },
-        { label: "Winners", value: winners },
-        { label: "Total", value: total }
+        { label: "Active", value: active, cls: "signals-stat--active" },
+        { label: "Winners", value: winners, cls: "signals-stat--won" },
+        { label: "Total", value: total, cls: "" }
     ];
 
-    stats.forEach(({ label, value }) => {
+    stats.forEach(({ label, value, cls }) => {
         const cell = document.createElement("div");
-        cell.className = "flex flex-col gap-1";
+        cell.className = "signals-stat" + (cls ? " " + cls : "");
 
         const valNode = document.createElement("span");
-        valNode.className = "data-mono text-lg font-semibold";
+        valNode.className = "signals-stat__value";
         valNode.textContent = value ?? "—";
 
         const labelNode = document.createElement("span");
-        labelNode.className = "text-caption";
+        labelNode.className = "signals-stat__label";
         labelNode.textContent = label;
 
         cell.appendChild(valNode);
         cell.appendChild(labelNode);
-        grid.appendChild(cell);
+        target.appendChild(cell);
+    });
+}
+
+/**
+ * Resolve a display-friendly status label for a signal.
+ */
+function getSignalStatusInfo(signal) {
+    const status = String(signal?.status || "active").toLowerCase();
+    if (status === "active" && signal.tp1HitAt) {
+        return { label: "HIT TP1", cls: "sc-status--tp1" };
+    }
+    if (status === "won") {
+        return { label: signal.tp2HitAt ? "HIT TP2" : "WON", cls: "sc-status--won" };
+    }
+    if (status === "lost") {
+        return { label: "STOPPED", cls: "sc-status--stopped" };
+    }
+    return { label: "ACTIVE", cls: "sc-status--active" };
+}
+
+/**
+ * Map symbol string to a short 2-letter icon and a colour class.
+ */
+function getSymbolIcon(symbol) {
+    const s = String(symbol || "").toUpperCase();
+    if (s.includes("XAU")) return { letters: "Au", cls: "sc-icon--gold" };
+    if (s.includes("XAG")) return { letters: "Ag", cls: "sc-icon--silver" };
+    if (s.includes("BTC")) return { letters: "₿", cls: "sc-icon--btc" };
+    if (s.includes("ETH")) return { letters: "Ξ", cls: "sc-icon--eth" };
+    if (s.includes("SOL")) return { letters: "◎", cls: "sc-icon--sol" };
+    if (s.includes("OIL") || s.includes("WTI") || s.includes("BRENT") || s.includes("CRUDE")) return { letters: "🛢", cls: "sc-icon--oil" };
+    // Forex: use first currency
+    const pair = s.replace(/[^A-Z]/g, "");
+    return { letters: pair.substring(0, 2), cls: "sc-icon--forex" };
+}
+
+/**
+ * Format symbol for display (e.g. XAUUSD → XAU/USD).
+ */
+function formatSymbol(symbol) {
+    const s = String(symbol || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (s.length === 6) return s.substring(0, 3) + "/" + s.substring(3);
+    return symbol || "—";
+}
+
+/**
+ * Format a date for signal card footer.
+ */
+function fmtSignalDate(dateStr) {
+    if (!dateStr) return "";
+    try {
+        return new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" }) +
+            ", " + new Date(dateStr).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+    } catch (_e) { return ""; }
+}
+
+/**
+ * Build share buttons row for a signal card.
+ */
+function buildShareButtons(signal) {
+    const row = document.createElement("div");
+    row.className = "sc-share";
+
+    const pageUrl = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(
+        `${signal.direction?.toUpperCase() || ""} ${formatSymbol(signal.symbol)} @ ${signal.entry} | TP1: ${signal.tp1}${signal.tp2 ? " TP2: " + signal.tp2 : ""} | SL: ${signal.stopLoss}`
+    );
+
+    const icons = [
+        { title: "X / Twitter", href: `https://x.com/intent/tweet?text=${text}&url=${pageUrl}`, svg: '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>' },
+        { title: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`, svg: '<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>' },
+        { title: "Copy Link", href: "#copy", svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>', fill: false },
+        { title: "WhatsApp", href: `https://api.whatsapp.com/send?text=${text}%20${pageUrl}`, svg: '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>' },
+        { title: "Telegram", href: `https://t.me/share/url?url=${pageUrl}&text=${text}`, svg: '<path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>' },
+        { title: "Chart", href: "#chart", svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4m0 0v3m0-3h-3"/><rect stroke-width="2" x="3" y="3" width="18" height="18" rx="2"/>', fill: false },
+        { title: "Share", href: "#share", svg: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>', fill: false }
+    ];
+
+    icons.forEach(({ title, href, svg, fill }) => {
+        const a = document.createElement("a");
+        a.className = "sc-share__btn";
+        a.title = title;
+        a.setAttribute("aria-label", title);
+
+        if (href === "#copy") {
+            a.href = "javascript:void(0)";
+            a.addEventListener("click", async (e) => {
+                e.preventDefault();
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    a.classList.add("sc-share__btn--copied");
+                    setTimeout(() => a.classList.remove("sc-share__btn--copied"), 1500);
+                } catch (_err) { /* silent */ }
+            });
+        } else if (href === "#chart" || href === "#share") {
+            a.href = "javascript:void(0)";
+        } else {
+            a.href = href;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+        }
+
+        const svgEl = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svgEl.setAttribute("viewBox", "0 0 24 24");
+        svgEl.setAttribute("class", "sc-share__icon");
+        if (fill !== false) {
+            svgEl.setAttribute("fill", "currentColor");
+        } else {
+            svgEl.setAttribute("fill", "none");
+            svgEl.setAttribute("stroke", "currentColor");
+        }
+        svgEl.innerHTML = svg;
+        a.appendChild(svgEl);
+        row.appendChild(a);
     });
 
-    target.appendChild(grid);
-
-    if (summary?.updatedAt) {
-        const updated = document.createElement("p");
-        updated.className = "text-caption text-center mt-3";
-        updated.textContent = `Updated: ${summary.updatedAt}`;
-        target.appendChild(updated);
-    }
+    return row;
 }
 
 function renderSignals(target, payload) {
@@ -900,21 +1019,32 @@ function renderSignals(target, payload) {
     signals.forEach((signal) => {
         const card = document.createElement("div");
 
+        // ── Locked signal ──
         if (isLockedSignal(signal)) {
-            card.className = "card-signal";
+            card.className = "sc-card";
 
             const header = document.createElement("div");
-            header.className = "flex items-center justify-between mb-2";
+            header.className = "sc-header";
 
-            const symbol = document.createElement("span");
-            symbol.className = "font-semibold text-text";
-            symbol.textContent = signal.symbol;
+            const symbolWrap = document.createElement("div");
+            symbolWrap.className = "sc-symbol-group";
+
+            const iconEl = document.createElement("div");
+            iconEl.className = "sc-icon sc-icon--locked";
+            iconEl.textContent = "🔒";
+
+            const nameEl = document.createElement("span");
+            nameEl.className = "sc-symbol";
+            nameEl.textContent = formatSymbol(signal.symbol);
+
+            symbolWrap.appendChild(iconEl);
+            symbolWrap.appendChild(nameEl);
 
             const badge = document.createElement("span");
-            badge.className = "badge badge--locked";
-            badge.textContent = "Locked";
+            badge.className = "sc-status sc-status--locked";
+            badge.textContent = "LOCKED";
 
-            header.appendChild(symbol);
+            header.appendChild(symbolWrap);
             header.appendChild(badge);
             card.appendChild(header);
 
@@ -927,159 +1057,138 @@ function renderSignals(target, payload) {
             return;
         }
 
+        // ── Full signal card ──
         if (isFullSignal(signal)) {
             const dir = (signal.direction || "").toLowerCase();
             const isBuy = dir === "buy" || dir === "long";
-            const dirClass = isBuy ? "card-signal--buy" : "card-signal--sell";
-            card.className = `card-signal ${dirClass}`;
+            card.className = "sc-card";
 
-            // ── Header row: symbol + direction badge + timeframe + time ──
+            // ── Header: icon + symbol + direction + status ──
             const header = document.createElement("div");
-            header.className = "flex items-center justify-between mb-1 flex-wrap gap-1";
+            header.className = "sc-header";
 
-            const symbolWrap = document.createElement("div");
-            symbolWrap.className = "flex items-center gap-2 flex-wrap";
+            const symbolGroup = document.createElement("div");
+            symbolGroup.className = "sc-symbol-group";
 
-            const symbol = document.createElement("span");
-            symbol.className = "font-semibold text-text text-base";
-            symbol.textContent = signal.symbol;
+            const iconInfo = getSymbolIcon(signal.symbol);
+            const iconEl = document.createElement("div");
+            iconEl.className = "sc-icon " + iconInfo.cls;
+            iconEl.textContent = iconInfo.letters;
 
-            const badge = document.createElement("span");
-            badge.className = isBuy ? "badge badge--buy" : "badge badge--sell";
-            badge.textContent = isBuy ? "▲ BUY" : "▼ SELL";
+            const nameWrap = document.createElement("div");
+            nameWrap.className = "sc-name-wrap";
 
-            symbolWrap.appendChild(symbol);
-            symbolWrap.appendChild(badge);
+            const symbolEl = document.createElement("span");
+            symbolEl.className = "sc-symbol";
+            symbolEl.textContent = formatSymbol(signal.symbol);
 
-            if (signal.chartTimeframe) {
-                const tf = document.createElement("span");
-                tf.className = "badge badge--neutral font-mono text-xs";
-                tf.textContent = signal.chartTimeframe;
-                symbolWrap.appendChild(tf);
-            }
+            const dirBadge = document.createElement("span");
+            dirBadge.className = isBuy ? "sc-dir sc-dir--buy" : "sc-dir sc-dir--sell";
+            dirBadge.textContent = isBuy ? "BUY" : "SELL";
 
-            header.appendChild(symbolWrap);
+            nameWrap.appendChild(symbolEl);
+            nameWrap.appendChild(dirBadge);
+            symbolGroup.appendChild(iconEl);
+            symbolGroup.appendChild(nameWrap);
 
-            const timeStr = relativeTime(signal.createdAt);
-            if (timeStr) {
-                const timeEl = document.createElement("span");
-                timeEl.className = "text-caption text-xs";
-                timeEl.textContent = timeStr;
-                header.appendChild(timeEl);
-            }
+            const statusInfo = getSignalStatusInfo(signal);
+            const statusBadge = document.createElement("span");
+            statusBadge.className = "sc-status " + statusInfo.cls;
+            statusBadge.textContent = statusInfo.label;
 
+            header.appendChild(symbolGroup);
+            header.appendChild(statusBadge);
             card.appendChild(header);
 
-            // ── Risk/Reward ratio bar ──
-            if (signal.riskReward != null) {
-                const rrRow = document.createElement("div");
-                rrRow.className = "flex items-center gap-2 mb-3";
+            // ── Price Grid (2×2) ──
+            const priceGrid = document.createElement("div");
+            priceGrid.className = "sc-prices";
 
-                const rrLabel = document.createElement("span");
-                rrLabel.className = "text-caption text-xs";
-                rrLabel.textContent = "Risk / Reward";
-
-                const rrVal = document.createElement("span");
-                rrVal.className = "data-mono text-xs text-success font-semibold";
-                rrVal.textContent = "1 : " + signal.riskReward.toFixed(2);
-
-                rrRow.appendChild(rrLabel);
-                rrRow.appendChild(rrVal);
-                card.appendChild(rrRow);
-            }
-
-            // ── Price data grid: Entry, SL, TP1, TP2 ──
-            const dataGrid = document.createElement("div");
-            dataGrid.className = "signal-data-grid";
-
-            const priceFields = [
-                { label: "Entry", value: signal.entry, cls: "" },
-                { label: "Stop Loss", value: signal.stopLoss, cls: "text-danger" },
+            const priceBoxes = [
+                { label: "ENTRY", value: signal.entry, cls: "sc-price--entry", hit: false },
+                { label: "STOP LOSS", value: signal.stopLoss, cls: "sc-price--sl", hit: false },
                 {
-                    label: signal.tp1HitAt ? "TP1 ✓" : "TP1",
+                    label: signal.tp1HitAt ? "TP 1 ✓" : "TP 1",
                     value: signal.tp1,
-                    cls: signal.tp1HitAt ? "text-success font-bold" : "text-success"
+                    cls: signal.tp1HitAt ? "sc-price--tp sc-price--hit" : "sc-price--tp",
+                    hit: !!signal.tp1HitAt
                 }
             ];
 
             if (signal.tp2 != null) {
-                priceFields.push({
-                    label: signal.tp2HitAt ? "TP2 ✓" : "TP2",
+                priceBoxes.push({
+                    label: signal.tp2HitAt ? "TP 2 ✓" : "TP 2",
                     value: signal.tp2,
-                    cls: signal.tp2HitAt ? "text-success font-bold" : "text-success opacity-80"
+                    cls: signal.tp2HitAt ? "sc-price--tp sc-price--hit" : "sc-price--tp2",
+                    hit: !!signal.tp2HitAt
                 });
             }
 
-            priceFields.forEach(({ label, value, cls }) => {
-                const cell = document.createElement("div");
-                cell.className = "flex flex-col";
+            priceBoxes.forEach(({ label, value, cls }) => {
+                const box = document.createElement("div");
+                box.className = "sc-price " + cls;
 
                 const lbl = document.createElement("span");
-                lbl.className = "text-caption text-xs";
-                lbl.textContent = label;
+                lbl.className = "sc-price__label";
+                lbl.innerHTML = "◇ " + label;
 
                 const val = document.createElement("span");
-                val.className = "data-mono text-sm " + cls;
+                val.className = "sc-price__value";
                 val.textContent = typeof value === "number" ? value.toFixed(2) : (value || "—");
 
-                cell.appendChild(lbl);
-                cell.appendChild(val);
-                dataGrid.appendChild(cell);
+                box.appendChild(lbl);
+                box.appendChild(val);
+                priceGrid.appendChild(box);
             });
 
-            card.appendChild(dataGrid);
+            card.appendChild(priceGrid);
 
             // ── Description ──
             if (signal.description) {
                 const desc = document.createElement("p");
-                desc.className = "text-muted text-xs mt-3 leading-relaxed";
+                desc.className = "sc-desc";
                 desc.textContent = signal.description;
                 card.appendChild(desc);
             }
 
-            // ── Expiry countdown ──
-            if (signal.expiresAt && signal.status === "active") {
-                const expiryEl = document.createElement("div");
-                expiryEl.className = "flex items-center gap-1 mt-3";
+            // ── Footer: timeframe + RR + date + share ──
+            const footer = document.createElement("div");
+            footer.className = "sc-footer";
 
-                const expiryIcon = document.createElement("span");
-                expiryIcon.className = "text-caption text-xs";
-                expiryIcon.textContent = "⏱";
+            const metaLeft = document.createElement("div");
+            metaLeft.className = "sc-meta";
 
-                const expiryLabel = document.createElement("span");
-                expiryLabel.className = "text-caption text-xs";
-
-                const expiresAt = new Date(signal.expiresAt);
-                const now = new Date();
-                const diffMs = expiresAt - now;
-
-                if (diffMs <= 0) {
-                    expiryLabel.textContent = "Expired";
-                    expiryLabel.classList.add("text-danger");
-                } else {
-                    const diffH = Math.floor(diffMs / 3600000);
-                    const diffM = Math.floor((diffMs % 3600000) / 60000);
-                    if (diffH >= 24) {
-                        const days = Math.floor(diffH / 24);
-                        expiryLabel.textContent = `Expires in ${days}d ${diffH % 24}h`;
-                    } else if (diffH > 0) {
-                        expiryLabel.textContent = `Expires in ${diffH}h ${diffM}m`;
-                    } else {
-                        expiryLabel.textContent = `Expires in ${diffM}m`;
-                        expiryLabel.classList.add("text-warning");
-                    }
-                }
-
-                expiryEl.appendChild(expiryIcon);
-                expiryEl.appendChild(expiryLabel);
-                card.appendChild(expiryEl);
+            if (signal.chartTimeframe) {
+                const tfEl = document.createElement("span");
+                tfEl.className = "sc-tf";
+                tfEl.textContent = signal.chartTimeframe.toUpperCase();
+                metaLeft.appendChild(tfEl);
             }
+
+            if (signal.riskReward != null) {
+                const rrEl = document.createElement("span");
+                rrEl.className = "sc-rr";
+                rrEl.textContent = "R/R  1:" + signal.riskReward.toFixed(1);
+                metaLeft.appendChild(rrEl);
+            }
+
+            const dateStr = fmtSignalDate(signal.createdAt);
+            if (dateStr) {
+                const dateEl = document.createElement("span");
+                dateEl.className = "sc-date";
+                dateEl.textContent = dateStr;
+                metaLeft.appendChild(dateEl);
+            }
+
+            footer.appendChild(metaLeft);
+            footer.appendChild(buildShareButtons(signal));
+            card.appendChild(footer);
 
             target.appendChild(card);
             return;
         }
 
-        card.className = "card-signal";
+        card.className = "sc-card";
         card.textContent = "Unknown signal shape";
         target.appendChild(card);
     });
