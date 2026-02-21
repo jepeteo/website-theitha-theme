@@ -3,14 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Theitha Signals Admin</title>
+  <title>Theitha · Signals Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
           colors: {
-            brand: { DEFAULT: "#e8c97a", dark: "#c9a84c" }
+            brand:  { DEFAULT: '#e8c97a', dark: '#c9a84c', light: '#f5e3b3' },
+            surface: { 1: '#0d0f14', 2: '#12141b', 3: '#181b24', 4: '#1f2330', 5: '#272b3a' },
+            accent:  { buy: '#22c55e', sell: '#ef4444' }
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.25)',
+            glow: '0 0 20px rgba(232,201,122,.08)'
           }
         }
       }
@@ -19,311 +29,500 @@
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
   <style>
     [x-cloak] { display: none !important; }
-    body { background-color: #0d0f14; }
+    body { background: #0d0f14; }
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #272b3a; border-radius: 3px; }
+
+    /* Animations */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+    .anim-fade-up { animation: fadeUp .4s ease-out both; }
+    .anim-slide-in { animation: slideIn .35s ease-out both; }
+    .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+    /* Toast */
+    @keyframes toast-in { from { opacity: 0; transform: translateY(-8px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes toast-out { from { opacity: 1; } to { opacity: 0; transform: translateY(-8px) scale(.96); } }
+    .toast-enter { animation: toast-in .3s ease-out; }
+    .toast-leave { animation: toast-out .25s ease-in forwards; }
+
+    /* Card left accent */
+    .card-accent-active { border-left: 3px solid #3b82f6; }
+    .card-accent-won    { border-left: 3px solid #22c55e; }
+    .card-accent-lost   { border-left: 3px solid #ef4444; }
+
+    /* Form inputs */
+    .fi {
+      width: 100%; background: #181b24; border: 1px solid #272b3a; border-radius: .625rem;
+      padding: .625rem .875rem; color: #fff; font-size: .875rem; transition: all .2s;
+    }
+    .fi::placeholder { color: #4b5563; }
+    .fi:focus { outline: none; border-color: #e8c97a; box-shadow: 0 0 0 3px rgba(232,201,122,.1); }
+
+    .fl { display: block; font-size: .6875rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .375rem; }
   </style>
 </head>
-<body class="text-gray-100 min-h-screen font-sans" x-data="adminApp()" x-init="init()">
+<body class="text-gray-100 min-h-screen font-sans antialiased" x-data="adminApp()" x-init="init()">
 
-  <!-- ── LOGIN SCREEN ─────────────────────────────────────────────────── -->
+  <!-- ═══════════ LOGIN ═══════════════════════════════════════════════ -->
   <div x-show="!loggedIn" x-cloak class="min-h-screen flex items-center justify-center px-4">
-    <div class="w-full max-w-sm">
-      <div class="text-center mb-8">
-        <div class="text-brand text-3xl font-bold tracking-wider">THEITHA</div>
-        <div class="text-gray-400 text-sm mt-1">Signals Admin Panel</div>
+    <div class="w-full max-w-sm anim-fade-up">
+      <!-- Logo -->
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand/10 mb-4">
+          <svg class="w-8 h-8 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+          </svg>
+        </div>
+        <h1 class="text-brand text-2xl font-extrabold tracking-wider">THEITHA</h1>
+        <p class="text-gray-500 text-sm mt-1">Signals Control Panel</p>
       </div>
-      <div class="bg-gray-900 border border-gray-700 rounded-2xl p-8">
+
+      <!-- Card -->
+      <div class="bg-surface-3 border border-surface-5 rounded-2xl p-8 shadow-card">
         <form @submit.prevent="login()">
-          <label class="block text-xs text-gray-400 uppercase tracking-widest mb-2">Password</label>
-          <input
-            type="password"
-            x-model="password"
-            placeholder="Enter admin password"
-            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand transition"
-            autofocus
-          />
-          <p x-show="loginError" x-text="loginError" class="text-red-400 text-sm mt-2"></p>
-          <button
-            type="submit"
-            :disabled="loggingIn"
-            class="mt-4 w-full bg-brand text-gray-900 font-bold py-3 rounded-lg hover:bg-brand-dark transition disabled:opacity-50"
-          >
+          <label class="fl">Password</label>
+          <div class="relative">
+            <input
+              type="password"
+              x-model="password"
+              placeholder="Enter admin password"
+              class="fi pr-10"
+              autofocus
+            />
+            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+            </svg>
+          </div>
+          <p x-show="loginError" x-text="loginError"
+            class="text-red-400 text-sm mt-2 flex items-center gap-1">
+          </p>
+          <button type="submit" :disabled="loggingIn"
+            class="mt-5 w-full bg-brand text-surface-1 font-bold py-3 rounded-xl hover:bg-brand-dark active:scale-[.98] transition-all disabled:opacity-50">
             <span x-show="!loggingIn">Sign In</span>
-            <span x-show="loggingIn">Signing in…</span>
+            <span x-show="loggingIn" class="flex items-center justify-center gap-2">
+              <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+              Signing in…
+            </span>
           </button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- ── MAIN DASHBOARD ────────────────────────────────────────────────── -->
-  <div x-show="loggedIn" x-cloak class="min-h-screen">
+  <!-- ═══════════ DASHBOARD ═══════════════════════════════════════════ -->
+  <div x-show="loggedIn" x-cloak class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <span class="text-brand font-bold text-xl tracking-wider">THEITHA</span>
-        <span class="text-gray-500 text-sm">/ Signals Admin</span>
+    <header class="sticky top-0 z-40 bg-surface-2/80 backdrop-blur-xl border-b border-surface-4">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center">
+            <svg class="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+            </svg>
+          </div>
+          <span class="text-brand font-extrabold text-lg tracking-wider">THEITHA</span>
+          <span class="hidden sm:inline text-surface-5 mx-1">/</span>
+          <span class="hidden sm:inline text-gray-500 text-sm font-medium">Signals</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="hidden sm:flex items-center gap-1.5 text-xs text-gray-500">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+            <span x-text="signals.filter(s => s.status === 'active').length + ' active'"></span>
+          </div>
+          <button @click="logout()"
+            class="flex items-center gap-2 text-gray-400 hover:text-white text-sm font-medium transition px-3 py-1.5 rounded-lg hover:bg-surface-4">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+            </svg>
+            Sign Out
+          </button>
+        </div>
       </div>
-      <button @click="logout()" class="text-gray-400 hover:text-white text-sm transition">Sign Out</button>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 xl:grid-cols-3 gap-8">
+    <!-- Stats Row -->
+    <div class="max-w-[1440px] mx-auto w-full px-4 sm:px-6 pt-6 pb-2">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-surface-3 rounded-xl p-4 border border-surface-4">
+          <div class="text-xs text-gray-500 font-medium mb-1">Total Signals</div>
+          <div class="text-2xl font-bold text-white" x-text="signals.length">0</div>
+        </div>
+        <div class="bg-surface-3 rounded-xl p-4 border border-surface-4">
+          <div class="text-xs text-blue-400 font-medium mb-1">Active</div>
+          <div class="text-2xl font-bold text-blue-400" x-text="signals.filter(s => s.status === 'active').length">0</div>
+        </div>
+        <div class="bg-surface-3 rounded-xl p-4 border border-surface-4">
+          <div class="text-xs text-emerald-400 font-medium mb-1">Won</div>
+          <div class="text-2xl font-bold text-emerald-400" x-text="signals.filter(s => s.status === 'won').length">0</div>
+        </div>
+        <div class="bg-surface-3 rounded-xl p-4 border border-surface-4">
+          <div class="text-xs text-red-400 font-medium mb-1">Lost</div>
+          <div class="text-2xl font-bold text-red-400" x-text="signals.filter(s => s.status === 'lost').length">0</div>
+        </div>
+      </div>
+    </div>
 
-      <!-- ── NEW SIGNAL FORM ───────────────────────────────────────────── -->
-      <div class="xl:col-span-1">
-        <div class="bg-gray-900 border border-gray-700 rounded-2xl p-6">
-          <h2 class="text-lg font-semibold mb-5 text-white">New Signal</h2>
+    <!-- Main Grid -->
+    <div class="max-w-[1440px] mx-auto w-full px-4 sm:px-6 py-6 flex-1 grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
 
-          <form @submit.prevent="createSignal()">
+      <!-- ── NEW SIGNAL ────────────────────────────────────────────────── -->
+      <div class="xl:col-span-4 xl:sticky xl:top-24">
+        <div class="bg-surface-3 border border-surface-4 rounded-2xl shadow-card overflow-hidden">
 
-            <!-- Symbol (fixed) -->
-            <div class="mb-4">
-              <label class="field-label">Symbol</label>
-              <div class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-brand font-bold">XAU/USD · Gold</div>
+          <!-- Form Header -->
+          <div class="px-6 pt-5 pb-4 border-b border-surface-4 flex items-center justify-between">
+            <div>
+              <h2 class="text-base font-bold text-white">New Signal</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Publish to all members</p>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center">
+              <svg class="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+              </svg>
+            </div>
+          </div>
+
+          <form @submit.prevent="createSignal()" class="p-6 space-y-5">
+
+            <!-- Symbol -->
+            <div>
+              <label class="fl">Symbol</label>
+              <div class="fi flex items-center gap-2 cursor-default !bg-surface-4/50">
+                <span class="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-xs font-bold text-amber-400">Au</span>
+                <span class="font-semibold text-brand text-sm">XAU/USD</span>
+                <span class="text-gray-500 text-xs">· Gold</span>
+              </div>
             </div>
 
-            <!-- Direction -->
-            <div class="mb-4">
-              <label class="field-label">Direction</label>
+            <!-- Direction Toggle -->
+            <div>
+              <label class="fl">Direction</label>
               <div class="grid grid-cols-2 gap-2">
-                <button type="button"
-                  @click="form.direction = 'buy'"
+                <button type="button" @click="form.direction = 'buy'"
                   :class="form.direction === 'buy'
-                    ? 'bg-emerald-500 text-white border-emerald-500'
-                    : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-emerald-600'"
-                  class="border rounded-lg py-3 font-bold text-sm transition">
-                  ▲ BUY
+                    ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/50 shadow-[inset_0_0_20px_rgba(34,197,94,.05)]'
+                    : 'bg-surface-4 text-gray-500 border-surface-5 hover:border-emerald-500/30 hover:text-gray-300'"
+                  class="border rounded-xl py-2.5 font-bold text-sm transition-all flex items-center justify-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4l8 8H4z"/></svg>
+                  BUY
                 </button>
-                <button type="button"
-                  @click="form.direction = 'sell'"
+                <button type="button" @click="form.direction = 'sell'"
                   :class="form.direction === 'sell'
-                    ? 'bg-red-500 text-white border-red-500'
-                    : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-red-600'"
-                  class="border rounded-lg py-3 font-bold text-sm transition">
-                  ▼ SELL
+                    ? 'bg-red-500/15 text-red-400 border-red-500/50 shadow-[inset_0_0_20px_rgba(239,68,68,.05)]'
+                    : 'bg-surface-4 text-gray-500 border-surface-5 hover:border-red-500/30 hover:text-gray-300'"
+                  class="border rounded-xl py-2.5 font-bold text-sm transition-all flex items-center justify-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 20l-8-8h16z"/></svg>
+                  SELL
                 </button>
               </div>
             </div>
 
-            <!-- Price Levels -->
-            <div class="grid grid-cols-2 gap-3 mb-4">
+            <!-- Prices Section -->
+            <div>
+              <label class="fl mb-3">Price Levels</label>
+              <div class="bg-surface-2 rounded-xl p-3 space-y-3 border border-surface-4/50">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-[10px] text-gray-500 font-medium uppercase tracking-wider mb-1 block">Entry *</label>
+                    <input type="number" step="0.01" x-model="form.entry" required placeholder="2320.50" class="fi !bg-surface-3 !text-sm !py-2" />
+                  </div>
+                  <div>
+                    <label class="text-[10px] text-gray-500 font-medium uppercase tracking-wider mb-1 block">Stop Loss *</label>
+                    <input type="number" step="0.01" x-model="form.stopLoss" required placeholder="2300.00" class="fi !bg-surface-3 !text-sm !py-2 focus:!border-red-500/60" />
+                  </div>
+                </div>
+                <div class="h-px bg-surface-4/60"></div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-[10px] text-emerald-400/70 font-medium uppercase tracking-wider mb-1 block">TP1 *</label>
+                    <input type="number" step="0.01" x-model="form.tp1" required placeholder="2360.00" class="fi !bg-surface-3 !text-sm !py-2 focus:!border-emerald-500/60" />
+                  </div>
+                  <div>
+                    <label class="text-[10px] text-emerald-400/50 font-medium uppercase tracking-wider mb-1 block">TP2 <span class="text-gray-600 normal-case">(opt)</span></label>
+                    <input type="number" step="0.01" x-model="form.tp2" placeholder="2400.00" class="fi !bg-surface-3 !text-sm !py-2 focus:!border-emerald-500/60" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RR Indicator -->
+            <div class="flex items-center justify-between bg-surface-2 border border-surface-4/50 rounded-xl px-4 py-3">
+              <span class="text-xs text-gray-500 font-medium">Risk / Reward</span>
+              <div class="flex items-center gap-2">
+                <div class="h-1.5 w-16 rounded-full bg-surface-5 overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-500"
+                    :style="rrRatio !== '—' ? 'width:' + Math.min(parseFloat(rrRatio)/5*100, 100) + '%' : 'width:0'"
+                    :class="rrRatio !== '—' && parseFloat(rrRatio) >= 2 ? 'bg-emerald-500' : rrRatio !== '—' && parseFloat(rrRatio) >= 1 ? 'bg-brand' : 'bg-red-500'"></div>
+                </div>
+                <span class="font-bold text-sm min-w-[3.5rem] text-right"
+                  :class="rrRatio !== '—' ? 'text-brand' : 'text-gray-600'"
+                  x-text="rrRatio !== '—' ? '1 : ' + rrRatio : '—'"></span>
+              </div>
+            </div>
+
+            <!-- Timeframe + Description -->
+            <div class="grid grid-cols-1 gap-4">
               <div>
-                <label class="field-label">Entry Price *</label>
-                <input type="number" step="0.01" x-model="form.entry" required
-                  placeholder="e.g. 2320.50"
-                  class="price-input" />
+                <label class="fl">Chart Timeframe</label>
+                <select x-model="form.chartTimeframe" class="fi !text-sm">
+                  <option value="">— Select —</option>
+                  <option value="1m">1 min</option>
+                  <option value="5m">5 min</option>
+                  <option value="15m">15 min</option>
+                  <option value="30m">30 min</option>
+                  <option value="1h">1 hour</option>
+                  <option value="4h">4 hours</option>
+                  <option value="1d">Daily</option>
+                  <option value="1w">Weekly</option>
+                </select>
               </div>
               <div>
-                <label class="field-label">Stop Loss *</label>
-                <input type="number" step="0.01" x-model="form.stopLoss" required
-                  placeholder="e.g. 2300.00"
-                  class="price-input" />
-              </div>
-              <div>
-                <label class="field-label">TP1 *</label>
-                <input type="number" step="0.01" x-model="form.tp1" required
-                  placeholder="e.g. 2360.00"
-                  class="price-input" />
-              </div>
-              <div>
-                <label class="field-label">TP2 <span class="text-gray-500">(optional)</span></label>
-                <input type="number" step="0.01" x-model="form.tp2"
-                  placeholder="e.g. 2400.00"
-                  class="price-input" />
-              </div>
-            </div>
-
-            <!-- RR Badge (auto-calculated) -->
-            <div class="mb-4 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 flex items-center justify-between">
-              <span class="text-sm text-gray-400">Risk / Reward Ratio</span>
-              <span class="font-bold text-lg"
-                :class="rrRatio !== '—' ? 'text-brand' : 'text-gray-500'"
-                x-text="rrRatio !== '—' ? '1 : ' + rrRatio : '—'"></span>
-            </div>
-
-            <!-- Chart Timeframe -->
-            <div class="mb-4">
-              <label class="field-label">Chart Timeframe</label>
-              <select x-model="form.chartTimeframe" class="price-input">
-                <option value="">— Select —</option>
-                <option value="1m">1 Minute</option>
-                <option value="5m">5 Minutes</option>
-                <option value="15m">15 Minutes</option>
-                <option value="30m">30 Minutes</option>
-                <option value="1h">1 Hour</option>
-                <option value="4h">4 Hours</option>
-                <option value="1d">Daily</option>
-                <option value="1w">Weekly</option>
-              </select>
-            </div>
-
-            <!-- Description -->
-            <div class="mb-4">
-              <label class="field-label">
-                Description
-                <span class="text-gray-500 normal-case font-normal">(max 2 sentences)</span>
-              </label>
-              <textarea
-                x-model="form.description"
-                maxlength="320"
-                rows="3"
-                placeholder="Brief analysis or reason for the signal…"
-                class="price-input resize-none"></textarea>
-              <div class="text-right text-xs text-gray-500 mt-1" x-text="(form.description || '').length + ' / 320'"></div>
-            </div>
-
-            <!-- Signal Date -->
-            <div class="mb-4">
-              <label class="field-label">Signal Date & Time</label>
-              <input type="datetime-local" x-model="form.signalDate" class="price-input" />
-              <p class="text-xs text-gray-500 mt-1">Leave blank to use current time</p>
-            </div>
-
-            <!-- Expiration -->
-            <div class="mb-5">
-              <div class="flex items-center justify-between mb-2">
-                <label class="field-label mb-0">Expiration</label>
-                <label class="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
-                  <input type="checkbox" x-model="form.customExpiry" class="accent-brand" />
-                  Custom
+                <label class="fl">
+                  Description <span class="text-gray-600 normal-case font-normal">(optional)</span>
                 </label>
-              </div>
-              <div x-show="!form.customExpiry" class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-400 text-sm">
-                Default: 24 hours from signal date
-              </div>
-              <div x-show="form.customExpiry" x-cloak>
-                <input type="datetime-local" x-model="form.expiresAt" class="price-input" />
+                <textarea x-model="form.description" maxlength="320" rows="2"
+                  placeholder="Brief analysis or reason for the signal…"
+                  class="fi resize-none !text-sm"></textarea>
+                <div class="text-right text-[10px] text-gray-600 mt-1" x-text="(form.description || '').length + '/320'"></div>
               </div>
             </div>
 
-            <!-- Feedback -->
-            <p x-show="formError" x-text="formError" class="text-red-400 text-sm mb-3"></p>
-            <p x-show="formSuccess" x-text="formSuccess" class="text-emerald-400 text-sm mb-3"></p>
+            <!-- Date & Expiry -->
+            <div class="bg-surface-2 rounded-xl p-3 space-y-3 border border-surface-4/50">
+              <div>
+                <label class="text-[10px] text-gray-500 font-medium uppercase tracking-wider mb-1 block">Signal Date & Time</label>
+                <input type="datetime-local" x-model="form.signalDate" class="fi !bg-surface-3 !text-sm !py-2" />
+                <p class="text-[10px] text-gray-600 mt-1">Leave blank = now</p>
+              </div>
+              <div class="h-px bg-surface-4/60"></div>
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="text-[10px] text-gray-500 font-medium uppercase tracking-wider">Expiration</label>
+                  <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                    <span class="text-[10px] text-gray-500">Custom</span>
+                    <div class="relative">
+                      <input type="checkbox" x-model="form.customExpiry" class="sr-only peer" />
+                      <div class="w-8 h-4 bg-surface-5 peer-checked:bg-brand/60 rounded-full transition-colors"></div>
+                      <div class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                    </div>
+                  </label>
+                </div>
+                <div x-show="!form.customExpiry" class="text-xs text-gray-500 py-1">
+                  Default: 24h from signal date
+                </div>
+                <div x-show="form.customExpiry" x-cloak>
+                  <input type="datetime-local" x-model="form.expiresAt" class="fi !bg-surface-3 !text-sm !py-2" />
+                </div>
+              </div>
+            </div>
 
             <!-- Submit -->
             <button type="submit" :disabled="submitting"
-              class="w-full bg-brand text-gray-900 font-bold py-3 rounded-lg hover:bg-brand-dark transition disabled:opacity-50">
-              <span x-show="!submitting">Publish Signal</span>
-              <span x-show="submitting">Publishing…</span>
+              class="w-full bg-brand text-surface-1 font-bold py-3 rounded-xl hover:bg-brand-dark active:scale-[.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              <template x-if="!submitting">
+                <span class="flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+                  </svg>
+                  Publish Signal
+                </span>
+              </template>
+              <template x-if="submitting">
+                <span class="flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                  Publishing…
+                </span>
+              </template>
             </button>
           </form>
         </div>
       </div>
 
-      <!-- ── SIGNALS LIST ───────────────────────────────────────────────── -->
-      <div class="xl:col-span-2">
+      <!-- ── SIGNALS LIST ──────────────────────────────────────────────── -->
+      <div class="xl:col-span-8">
 
-        <!-- Tabs -->
-        <div class="flex gap-2 mb-4 flex-wrap">
-          <template x-for="tab in ['active','won','lost','all']">
-            <button
-              @click="activeTab = tab"
-              :class="activeTab === tab
-                ? 'bg-brand text-gray-900'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'"
-              class="px-5 py-2 rounded-full text-sm font-semibold transition capitalize"
-              x-text="tab + (tab !== 'all' ? ' (' + signals.filter(s => s.status === tab).length + ')' : ' (' + signals.length + ')')">
-            </button>
-          </template>
-          <button @click="loadSignals()" class="ml-auto text-gray-400 hover:text-white transition text-sm px-3">
-            ↻ Refresh
+        <!-- Toolbar -->
+        <div class="flex items-center gap-2 mb-5 flex-wrap">
+          <!-- Tab Pills -->
+          <div class="flex bg-surface-3 rounded-xl p-1 border border-surface-4">
+            <template x-for="tab in ['active','won','lost','all']">
+              <button @click="activeTab = tab"
+                :class="activeTab === tab
+                  ? 'bg-surface-5 text-white shadow-sm'
+                  : 'text-gray-500 hover:text-gray-300'"
+                class="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize"
+                x-text="tab === 'all' ? 'All ' + signals.length : tab.charAt(0).toUpperCase() + tab.slice(1) + ' ' + signals.filter(s => s.status === tab).length">
+              </button>
+            </template>
+          </div>
+
+          <!-- Refresh -->
+          <button @click="loadSignals()" :class="loading ? 'animate-spin' : ''"
+            class="ml-auto w-8 h-8 rounded-lg bg-surface-3 border border-surface-4 flex items-center justify-center text-gray-400 hover:text-white hover:border-surface-5 transition">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/>
+            </svg>
           </button>
         </div>
 
-        <!-- Loading -->
-        <div x-show="loading" class="text-center text-gray-500 py-12">Loading signals…</div>
-
-        <!-- Empty -->
-        <div x-show="!loading && filteredSignals.length === 0"
-          class="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center text-gray-500">
-          No <span x-text="activeTab"></span> signals found.
+        <!-- Loading Skeleton -->
+        <div x-show="loading" class="space-y-4">
+          <template x-for="i in 3">
+            <div class="bg-surface-3 border border-surface-4 rounded-2xl p-5 animate-pulse">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="h-5 w-20 bg-surface-5 rounded"></div>
+                <div class="h-5 w-12 bg-surface-5 rounded-full"></div>
+                <div class="h-5 w-14 bg-surface-5 rounded-full"></div>
+              </div>
+              <div class="grid grid-cols-4 gap-3">
+                <div class="h-16 bg-surface-4 rounded-lg"></div>
+                <div class="h-16 bg-surface-4 rounded-lg"></div>
+                <div class="h-16 bg-surface-4 rounded-lg"></div>
+                <div class="h-16 bg-surface-4 rounded-lg"></div>
+              </div>
+            </div>
+          </template>
         </div>
 
-        <!-- Cards -->
-        <div class="space-y-4">
-          <template x-for="signal in filteredSignals" :key="signal.id">
-            <div class="bg-gray-900 border border-gray-700 rounded-2xl p-5">
+        <!-- Empty State -->
+        <div x-show="!loading && filteredSignals.length === 0"
+          class="bg-surface-3 border border-surface-4 rounded-2xl p-16 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-surface-4 flex items-center justify-center">
+            <svg class="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+            </svg>
+          </div>
+          <p class="text-gray-500 font-medium">No <span x-text="activeTab" class="capitalize"></span> signals</p>
+          <p class="text-gray-600 text-sm mt-1">Create a new signal to get started</p>
+        </div>
 
-              <!-- Top row: symbol + direction + status -->
-              <div class="flex items-center gap-3 mb-4 flex-wrap">
-                <span class="font-bold text-white text-lg">XAU/USD</span>
+        <!-- Signal Cards -->
+        <div x-show="!loading" class="space-y-3">
+          <template x-for="(signal, idx) in filteredSignals" :key="signal.id">
+            <div :class="'card-accent-' + signal.status"
+              class="bg-surface-3 border border-surface-4 rounded-2xl overflow-hidden shadow-card hover:border-surface-5 transition-all anim-slide-in"
+              :style="'animation-delay:' + (idx * 50) + 'ms'">
 
-                <span :class="signal.direction === 'buy' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'"
-                  class="px-3 py-0.5 rounded-full text-xs font-bold uppercase"
-                  x-text="signal.direction === 'buy' ? '▲ BUY' : '▼ SELL'"></span>
+              <!-- Card Header -->
+              <div class="px-5 pt-4 pb-3 flex items-center gap-2.5 flex-wrap">
+                <!-- Symbol -->
+                <div class="flex items-center gap-2">
+                  <span class="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center text-[10px] font-bold text-amber-400">Au</span>
+                  <span class="font-bold text-white">XAU/USD</span>
+                </div>
 
+                <!-- Direction Badge -->
+                <span :class="signal.direction === 'buy'
+                    ? 'bg-emerald-500/15 text-emerald-400 ring-emerald-500/20'
+                    : 'bg-red-500/15 text-red-400 ring-red-500/20'"
+                  class="px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase ring-1 flex items-center gap-1">
+                  <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24" x-show="signal.direction === 'buy'"><path d="M12 4l8 8H4z"/></svg>
+                  <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24" x-show="signal.direction === 'sell'"><path d="M12 20l-8-8h16z"/></svg>
+                  <span x-text="signal.direction"></span>
+                </span>
+
+                <!-- Status Badge -->
                 <span :class="{
-                    'bg-blue-500/20 text-blue-400': signal.status === 'active',
-                    'bg-emerald-500/20 text-emerald-400': signal.status === 'won',
-                    'bg-red-500/20 text-red-400': signal.status === 'lost'
+                    'bg-blue-500/15 text-blue-400 ring-blue-500/20': signal.status === 'active',
+                    'bg-emerald-500/15 text-emerald-400 ring-emerald-500/20': signal.status === 'won',
+                    'bg-red-500/15 text-red-400 ring-red-500/20': signal.status === 'lost'
                   }"
-                  class="px-3 py-0.5 rounded-full text-xs font-bold uppercase"
+                  class="px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase ring-1"
                   x-text="signal.status"></span>
 
+                <!-- Timeframe -->
                 <span x-show="signal.chartTimeframe"
-                  class="bg-gray-700 text-gray-300 px-2 py-0.5 rounded text-xs font-mono"
+                  class="bg-surface-4 text-gray-400 px-2 py-0.5 rounded-md text-[11px] font-mono font-medium"
                   x-text="signal.chartTimeframe"></span>
 
+                <!-- RR on the right -->
                 <span x-show="signal.riskReward"
-                  class="ml-auto text-brand font-bold text-sm"
+                  class="ml-auto text-brand font-bold text-sm tabular-nums"
                   x-text="signal.riskReward ? '1:' + signal.riskReward : ''"></span>
               </div>
 
-              <!-- Price grid -->
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                <div class="bg-gray-800 rounded-lg p-3">
-                  <div class="text-xs text-gray-500 mb-1">Entry</div>
-                  <div class="font-bold font-mono" x-text="signal.entry.toFixed(2)"></div>
-                </div>
-                <div class="bg-red-900/30 rounded-lg p-3">
-                  <div class="text-xs text-gray-500 mb-1">Stop Loss</div>
-                  <div class="font-bold font-mono text-red-400" x-text="signal.stopLoss.toFixed(2)"></div>
-                </div>
-                <div class="bg-emerald-900/30 rounded-lg p-3">
-                  <div class="text-xs text-gray-500 mb-1">TP1</div>
-                  <div class="font-bold font-mono text-emerald-400"
-                    x-text="signal.tp1.toFixed(2) + (signal.tp1HitAt ? ' ✓' : '')"></div>
-                </div>
-                <div x-show="signal.tp2" class="bg-emerald-900/20 rounded-lg p-3">
-                  <div class="text-xs text-gray-500 mb-1">TP2</div>
-                  <div class="font-bold font-mono text-emerald-300"
-                    x-text="signal.tp2 ? signal.tp2.toFixed(2) + (signal.tp2HitAt ? ' ✓' : '') : ''"></div>
+              <!-- Price Grid -->
+              <div class="px-5 pb-3">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div class="bg-surface-2 rounded-lg p-3 border border-surface-4/40">
+                    <div class="text-[10px] text-gray-500 font-medium uppercase tracking-wider mb-1">Entry</div>
+                    <div class="font-bold font-mono text-white text-sm" x-text="signal.entry.toFixed(2)"></div>
+                  </div>
+                  <div class="bg-surface-2 rounded-lg p-3 border border-red-500/10">
+                    <div class="text-[10px] text-red-400/60 font-medium uppercase tracking-wider mb-1">Stop Loss</div>
+                    <div class="font-bold font-mono text-red-400 text-sm" x-text="signal.stopLoss.toFixed(2)"></div>
+                  </div>
+                  <div class="bg-surface-2 rounded-lg p-3 border border-emerald-500/10">
+                    <div class="text-[10px] font-medium uppercase tracking-wider mb-1"
+                      :class="signal.tp1HitAt ? 'text-emerald-400' : 'text-emerald-400/60'">
+                      TP1 <span x-show="signal.tp1HitAt" class="text-emerald-400">✓</span>
+                    </div>
+                    <div class="font-bold font-mono text-emerald-400 text-sm" x-text="signal.tp1.toFixed(2)"></div>
+                  </div>
+                  <div x-show="signal.tp2" class="bg-surface-2 rounded-lg p-3 border border-emerald-500/5">
+                    <div class="text-[10px] font-medium uppercase tracking-wider mb-1"
+                      :class="signal.tp2HitAt ? 'text-emerald-300' : 'text-emerald-400/40'">
+                      TP2 <span x-show="signal.tp2HitAt" class="text-emerald-300">✓</span>
+                    </div>
+                    <div class="font-bold font-mono text-emerald-300 text-sm"
+                      x-text="signal.tp2 ? signal.tp2.toFixed(2) : ''"></div>
+                  </div>
                 </div>
               </div>
 
               <!-- Description -->
-              <p x-show="signal.description" x-text="signal.description"
-                class="text-gray-400 text-sm mb-4 leading-relaxed"></p>
-
-              <!-- Dates -->
-              <div class="flex gap-4 text-xs text-gray-500 mb-4 flex-wrap">
-                <span>Created: <span class="text-gray-300" x-text="fmtDate(signal.createdAt)"></span></span>
-                <span>Expires: <span
-                  :class="isExpired(signal.expiresAt) && signal.status === 'active' ? 'text-red-400' : 'text-gray-300'"
-                  x-text="fmtDate(signal.expiresAt)"></span></span>
+              <div x-show="signal.description" class="px-5 pb-3">
+                <p x-text="signal.description"
+                  class="text-gray-400 text-sm leading-relaxed bg-surface-2/50 rounded-lg px-3 py-2 border-l-2 border-brand/30"></p>
               </div>
 
-              <!-- Actions -->
-              <div x-show="signal.status === 'active'" class="flex gap-2 flex-wrap">
-                <button @click="markStatus(signal.id, 'won')"
-                  class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm rounded-lg font-semibold transition">
-                  ✓ Mark Won
-                </button>
-                <button @click="markStatus(signal.id, 'lost')"
-                  class="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white text-sm rounded-lg font-semibold transition">
-                  ✗ Mark Lost
-                </button>
-              </div>
-              <div class="flex gap-2 mt-2">
-                <button @click="confirmDelete(signal.id)"
-                  class="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition">
-                  Delete
-                </button>
-              </div>
+              <!-- Footer: Dates + Actions -->
+              <div class="px-5 pb-4 flex items-center gap-3 flex-wrap">
+                <!-- Dates -->
+                <div class="flex items-center gap-3 text-[11px] text-gray-500">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span x-text="fmtDate(signal.createdAt)"></span>
+                  </span>
+                  <span>→</span>
+                  <span :class="isExpired(signal.expiresAt) && signal.status === 'active' ? 'text-red-400 font-medium' : ''"
+                    x-text="fmtDate(signal.expiresAt)"></span>
+                </div>
 
+                <!-- Actions -->
+                <div class="ml-auto flex items-center gap-2">
+                  <template x-if="signal.status === 'active'">
+                    <div class="flex gap-1.5">
+                      <button @click="markStatus(signal.id, 'won')"
+                        class="px-3 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 text-xs rounded-lg font-semibold transition-all ring-1 ring-emerald-500/20 hover:ring-emerald-500/40">
+                        ✓ Won
+                      </button>
+                      <button @click="markStatus(signal.id, 'lost')"
+                        class="px-3 py-1.5 bg-red-500/15 hover:bg-red-500/25 text-red-400 text-xs rounded-lg font-semibold transition-all ring-1 ring-red-500/20 hover:ring-red-500/40">
+                        ✗ Lost
+                      </button>
+                    </div>
+                  </template>
+                  <button @click="deleteTarget = signal.id; showDeleteModal = true"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                    title="Delete">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           </template>
         </div>
@@ -331,44 +530,84 @@
     </div><!-- /grid -->
   </div><!-- /dashboard -->
 
-  <style>
-    .field-label { @apply block text-xs text-gray-400 uppercase tracking-widest mb-1.5; }
-    .price-input { @apply w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-brand transition; }
-  </style>
+  <!-- ═══════════ DELETE MODAL ═════════════════════════════════════════ -->
+  <div x-show="showDeleteModal" x-cloak
+    class="fixed inset-0 z-50 flex items-center justify-center p-4"
+    @keydown.escape.window="showDeleteModal = false">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showDeleteModal = false"
+      x-transition:enter="transition duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+      x-transition:leave="transition duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+    <div class="relative bg-surface-3 border border-surface-4 rounded-2xl p-6 w-full max-w-sm shadow-card"
+      x-transition:enter="transition duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+      x-transition:leave="transition duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+      <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-red-500/10 flex items-center justify-center">
+        <svg class="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+        </svg>
+      </div>
+      <h3 class="text-white font-bold text-center mb-1">Delete Signal</h3>
+      <p class="text-gray-400 text-sm text-center mb-6">This action cannot be undone. The signal will be permanently removed.</p>
+      <div class="grid grid-cols-2 gap-3">
+        <button @click="showDeleteModal = false"
+          class="px-4 py-2.5 bg-surface-4 hover:bg-surface-5 text-gray-300 text-sm rounded-xl font-semibold transition">
+          Cancel
+        </button>
+        <button @click="executeDelete()"
+          class="px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white text-sm rounded-xl font-semibold transition">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ TOAST ═══════════════════════════════════════════════ -->
+  <div class="fixed top-4 right-4 z-50 space-y-2" x-show="toast.show" x-cloak>
+    <div :class="toast.type === 'success' ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-red-500/30 bg-red-500/10'"
+      class="px-4 py-3 rounded-xl border backdrop-blur-xl shadow-card flex items-center gap-3 min-w-[280px] toast-enter">
+      <template x-if="toast.type === 'success'">
+        <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </template>
+      <template x-if="toast.type === 'error'">
+        <svg class="w-5 h-5 text-red-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+        </svg>
+      </template>
+      <span class="text-sm text-white font-medium" x-text="toast.message"></span>
+    </div>
+  </div>
 
   <script>
     function adminApp() {
       return {
-        // Auth
+        /* ── Auth ──────────────────────────────────────────── */
         loggedIn: false,
         password: '',
         loginError: '',
         loggingIn: false,
         token: '',
 
-        // Signals list
+        /* ── Signals ──────────────────────────────────────── */
         signals: [],
         activeTab: 'active',
         loading: false,
 
-        // Form
+        /* ── Form ─────────────────────────────────────────── */
         form: {
           direction: 'buy',
-          entry: '',
-          stopLoss: '',
-          tp1: '',
-          tp2: '',
-          description: '',
-          chartTimeframe: '1h',
-          signalDate: '',
-          expiresAt: '',
-          customExpiry: false
+          entry: '', stopLoss: '', tp1: '', tp2: '',
+          description: '', chartTimeframe: '1h',
+          signalDate: '', expiresAt: '', customExpiry: false
         },
         submitting: false,
-        formError: '',
-        formSuccess: '',
 
-        // ── Computed ─────────────────────────────────────────
+        /* ── UI State ─────────────────────────────────────── */
+        showDeleteModal: false,
+        deleteTarget: null,
+        toast: { show: false, message: '', type: 'success' },
+
+        /* ── Computed ─────────────────────────────────────── */
         get rrRatio() {
           const e = parseFloat(this.form.entry);
           const sl = parseFloat(this.form.stopLoss);
@@ -385,7 +624,7 @@
           return this.signals.filter(s => s.status === this.activeTab);
         },
 
-        // ── Init ─────────────────────────────────────────────
+        /* ── Init ─────────────────────────────────────────── */
         init() {
           const stored = localStorage.getItem('theitha_admin_token');
           if (stored) {
@@ -395,7 +634,13 @@
           }
         },
 
-        // ── Auth ─────────────────────────────────────────────
+        /* ── Toast helper ─────────────────────────────────── */
+        showToast(message, type = 'success') {
+          this.toast = { show: true, message, type };
+          setTimeout(() => { this.toast.show = false; }, 3500);
+        },
+
+        /* ── Auth ─────────────────────────────────────────── */
         async login() {
           this.loginError = '';
           this.loggingIn = true;
@@ -406,20 +651,14 @@
               body: JSON.stringify({ password: this.password })
             });
             const data = await res.json();
-            if (!res.ok) {
-              this.loginError = data.error || 'Login failed';
-              return;
-            }
+            if (!res.ok) { this.loginError = data.error || 'Login failed'; return; }
             this.token = data.token;
             localStorage.setItem('theitha_admin_token', data.token);
             this.loggedIn = true;
             this.password = '';
             this.loadSignals();
-          } catch {
-            this.loginError = 'Connection error. Try again.';
-          } finally {
-            this.loggingIn = false;
-          }
+          } catch { this.loginError = 'Connection error. Try again.'; }
+          finally { this.loggingIn = false; }
         },
 
         logout() {
@@ -429,35 +668,25 @@
           this.signals = [];
         },
 
-        // ── API helpers ───────────────────────────────────────
+        /* ── API helpers ──────────────────────────────────── */
         authHeaders() {
-          return {
-            'Authorization': `Bearer ${this.token}`,
-            'Content-Type': 'application/json'
-          };
+          return { 'Authorization': `Bearer ${this.token}`, 'Content-Type': 'application/json' };
         },
 
-        // ── Load signals ──────────────────────────────────────
+        /* ── Load ─────────────────────────────────────────── */
         async loadSignals() {
           this.loading = true;
           try {
-            const res = await fetch('/api/admin/signals', {
-              headers: this.authHeaders()
-            });
+            const res = await fetch('/api/admin/signals', { headers: this.authHeaders() });
             if (res.status === 401) { this.logout(); return; }
             const data = await res.json();
             this.signals = data.data || [];
-          } catch {
-            // silent
-          } finally {
-            this.loading = false;
-          }
+          } catch { /* silent */ }
+          finally { this.loading = false; }
         },
 
-        // ── Create signal ─────────────────────────────────────
+        /* ── Create ───────────────────────────────────────── */
         async createSignal() {
-          this.formError = '';
-          this.formSuccess = '';
           this.submitting = true;
           try {
             const payload = {
@@ -471,68 +700,52 @@
               chartTimeframe: this.form.chartTimeframe || null,
               signalDate: this.form.signalDate ? new Date(this.form.signalDate).toISOString() : null,
               expiresAt: this.form.customExpiry && this.form.expiresAt
-                ? new Date(this.form.expiresAt).toISOString()
-                : null
+                ? new Date(this.form.expiresAt).toISOString() : null
             };
-
             const res = await fetch('/api/admin/signals', {
-              method: 'POST',
-              headers: this.authHeaders(),
-              body: JSON.stringify(payload)
+              method: 'POST', headers: this.authHeaders(), body: JSON.stringify(payload)
             });
             const data = await res.json();
-            if (!res.ok) {
-              this.formError = data.error || 'Failed to create signal';
-              return;
-            }
-            this.formSuccess = 'Signal published successfully!';
+            if (!res.ok) { this.showToast(data.error || 'Failed to create signal', 'error'); return; }
+            this.showToast('Signal published successfully!');
             this.resetForm();
             this.signals.unshift(data.data);
-            setTimeout(() => { this.formSuccess = ''; }, 4000);
-          } catch {
-            this.formError = 'Connection error. Please try again.';
-          } finally {
-            this.submitting = false;
-          }
+          } catch { this.showToast('Connection error. Try again.', 'error'); }
+          finally { this.submitting = false; }
         },
 
-        // ── Mark won/lost ─────────────────────────────────────
+        /* ── Mark won/lost ────────────────────────────────── */
         async markStatus(id, status) {
           try {
             const res = await fetch(`/api/admin/signals/${id}`, {
-              method: 'PATCH',
-              headers: this.authHeaders(),
-              body: JSON.stringify({ status })
+              method: 'PATCH', headers: this.authHeaders(), body: JSON.stringify({ status })
             });
             if (!res.ok) return;
             const data = await res.json();
             const idx = this.signals.findIndex(s => s.id === id);
             if (idx !== -1) this.signals[idx] = data.data;
-          } catch {
-            // silent
-          }
+            this.showToast(`Signal marked as ${status}`);
+          } catch { /* silent */ }
         },
 
-        // ── Delete ────────────────────────────────────────────
-        async confirmDelete(id) {
-          if (!confirm('Delete this signal? This cannot be undone.')) return;
+        /* ── Delete ───────────────────────────────────────── */
+        async executeDelete() {
+          const id = this.deleteTarget;
+          this.showDeleteModal = false;
           try {
             const res = await fetch(`/api/admin/signals/${id}`, {
-              method: 'DELETE',
-              headers: this.authHeaders()
+              method: 'DELETE', headers: this.authHeaders()
             });
             if (!res.ok) return;
             this.signals = this.signals.filter(s => s.id !== id);
-          } catch {
-            // silent
-          }
+            this.showToast('Signal deleted');
+          } catch { /* silent */ }
         },
 
-        // ── Helpers ───────────────────────────────────────────
+        /* ── Helpers ──────────────────────────────────────── */
         resetForm() {
           this.form = {
-            direction: 'buy',
-            entry: '', stopLoss: '', tp1: '', tp2: '',
+            direction: 'buy', entry: '', stopLoss: '', tp1: '', tp2: '',
             description: '', chartTimeframe: '1h',
             signalDate: '', expiresAt: '', customExpiry: false
           };
