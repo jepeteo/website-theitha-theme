@@ -13,6 +13,8 @@ export type AppEnv = {
   ghostAdminApiKey: string;
   databaseUrl: string;
   adminBypassEmails: string[];
+  twelveDataApiKey: string;
+  adminPassword: string;
   jwksCacheTtlSeconds: number;
   memberCacheTtlSeconds: number;
   summaryCacheTtlSeconds: number;
@@ -67,6 +69,8 @@ export function getAppEnv(processEnv: NodeJS.ProcessEnv = process.env): AppEnv {
     processEnv.GHOST_ADMIN_API_KEY
   );
   const databaseUrl = requireNonEmpty("DATABASE_URL", processEnv.DATABASE_URL);
+  const twelveDataApiKey = requireNonEmpty("TWELVE_DATA_API_KEY", processEnv.TWELVE_DATA_API_KEY);
+  const adminPassword = requireNonEmpty("ADMIN_PASSWORD", processEnv.ADMIN_PASSWORD);
 
   return {
     publicSiteOrigin,
@@ -74,6 +78,8 @@ export function getAppEnv(processEnv: NodeJS.ProcessEnv = process.env): AppEnv {
     ghostAdminApiUrl,
     ghostAdminApiKey,
     databaseUrl,
+    twelveDataApiKey,
+    adminPassword,
     adminBypassEmails: readCsvEmails(processEnv.ADMIN_BYPASS_EMAILS),
     jwksCacheTtlSeconds: readPositiveInt(
       processEnv.JWKS_CACHE_TTL,
