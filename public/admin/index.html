@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Theitha Signals Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { DEFAULT: "#e8c97a", dark: "#c9a84c" }
+          }
+        }
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    body { background-color: #0d0f14; }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+  </style>
+</head>
+<body class="text-gray-100 min-h-screen font-sans" x-data="adminApp()" x-init="init()">
+
+  <!-- ── LOGIN SCREEN ─────────────────────────────────────────────────── -->
+  <div x-show="!loggedIn" x-cloak class="min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-sm">
+      <div class="text-center mb-8">
+        <div class="text-brand text-3xl font-bold tracking-wider">THEITHA</div>
+        <div class="text-gray-400 text-sm mt-1">Signals Admin Panel</div>
+      </div>
+      <div class="bg-gray-900 border border-gray-700 rounded-2xl p-8">
+        <form @submit.prevent="login()">
+          <label class="block text-xs text-gray-400 uppercase tracking-widest mb-2">Password</label>
+          <input
+            type="password"
+            x-model="password"
+            placeholder="Enter admin password"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand transition"
+            autofocus
+          />
+          <p x-show="loginError" x-text="loginError" class="text-red-400 text-sm mt-2"></p>
+          <button
+            type="submit"
+            :disabled="loggingIn"
+            class="mt-4 w-full bg-brand text-gray-900 font-bold py-3 rounded-lg hover:bg-brand-dark transition disabled:opacity-50"
+          >
+            <span x-show="!loggingIn">Sign In</span>
+            <span x-show="loggingIn">Signing in…</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN DASHBOARD ────────────────────────────────────────────────── -->
+  <div x-show="loggedIn" x-cloak class="min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-brand font-bold text-xl tracking-wider">THEITHA</span>
+        <span class="text-gray-500 text-sm">/ Signals Admin</span>
+      </div>
+      <button @click="logout()" class="text-gray-400 hover:text-white text-sm transition">Sign Out</button>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 xl:grid-cols-3 gap-8">
+
+      <!-- ── NEW SIGNAL FORM ───────────────────────────────────────────── -->
+      <div class="xl:col-span-1">
+        <div class="bg-gray-900 border border-gray-700 rounded-2xl p-6">
+          <h2 class="text-lg font-semibold mb-5 text-white">New Signal</h2>
+
+          <form @submit.prevent="createSignal()">
+
+            <!-- Symbol (fixed) -->
+            <div class="mb-4">
+              <label class="field-label">Symbol</label>
+              <div class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-brand font-bold">XAU/USD · Gold</div>
+            </div>
+
+            <!-- Direction -->
+            <div class="mb-4">
+              <label class="field-label">Direction</label>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button"
+                  @click="form.direction = 'buy'"
+                  :class="form.direction === 'buy'
+                    ? 'bg-emerald-500 text-white border-emerald-500'
+                    : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-emerald-600'"
+                  class="border rounded-lg py-3 font-bold text-sm transition">
+                  ▲ BUY
+                </button>
+                <button type="button"
+                  @click="form.direction = 'sell'"
+                  :class="form.direction === 'sell'
+                    ? 'bg-red-500 text-white border-red-500'
+                    : 'bg-gray-800 text-gray-400 border-gray-700 hover:border-red-600'"
+                  class="border rounded-lg py-3 font-bold text-sm transition">
+                  ▼ SELL
+                </button>
+              </div>
+            </div>
+
+            <!-- Price Levels -->
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div>
+                <label class="field-label">Entry Price *</label>
+                <input type="number" step="0.01" x-model="form.entry" required
+                  placeholder="e.g. 2320.50"
+                  class="price-input" />
+              </div>
+              <div>
+                <label class="field-label">Stop Loss *</label>
+                <input type="number" step="0.01" x-model="form.stopLoss" required
+                  placeholder="e.g. 2300.00"
+                  class="price-input" />
+              </div>
+              <div>
+                <label class="field-label">TP1 *</label>
+                <input type="number" step="0.01" x-model="form.tp1" required
+                  placeholder="e.g. 2360.00"
+                  class="price-input" />
+              </div>
+              <div>
+                <label class="field-label">TP2 <span class="text-gray-500">(optional)</span></label>
+                <input type="number" step="0.01" x-model="form.tp2"
+                  placeholder="e.g. 2400.00"
+                  class="price-input" />
+              </div>
+            </div>
+
+            <!-- RR Badge (auto-calculated) -->
+            <div class="mb-4 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 flex items-center justify-between">
+              <span class="text-sm text-gray-400">Risk / Reward Ratio</span>
+              <span class="font-bold text-lg"
+                :class="rrRatio !== '—' ? 'text-brand' : 'text-gray-500'"
+                x-text="rrRatio !== '—' ? '1 : ' + rrRatio : '—'"></span>
+            </div>
+
+            <!-- Chart Timeframe -->
+            <div class="mb-4">
+              <label class="field-label">Chart Timeframe</label>
+              <select x-model="form.chartTimeframe" class="price-input">
+                <option value="">— Select —</option>
+                <option value="1m">1 Minute</option>
+                <option value="5m">5 Minutes</option>
+                <option value="15m">15 Minutes</option>
+                <option value="30m">30 Minutes</option>
+                <option value="1h">1 Hour</option>
+                <option value="4h">4 Hours</option>
+                <option value="1d">Daily</option>
+                <option value="1w">Weekly</option>
+              </select>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+              <label class="field-label">
+                Description
+                <span class="text-gray-500 normal-case font-normal">(max 2 sentences)</span>
+              </label>
+              <textarea
+                x-model="form.description"
+                maxlength="320"
+                rows="3"
+                placeholder="Brief analysis or reason for the signal…"
+                class="price-input resize-none"></textarea>
+              <div class="text-right text-xs text-gray-500 mt-1" x-text="(form.description || '').length + ' / 320'"></div>
+            </div>
+
+            <!-- Signal Date -->
+            <div class="mb-4">
+              <label class="field-label">Signal Date & Time</label>
+              <input type="datetime-local" x-model="form.signalDate" class="price-input" />
+              <p class="text-xs text-gray-500 mt-1">Leave blank to use current time</p>
+            </div>
+
+            <!-- Expiration -->
+            <div class="mb-5">
+              <div class="flex items-center justify-between mb-2">
+                <label class="field-label mb-0">Expiration</label>
+                <label class="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                  <input type="checkbox" x-model="form.customExpiry" class="accent-brand" />
+                  Custom
+                </label>
+              </div>
+              <div x-show="!form.customExpiry" class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-gray-400 text-sm">
+                Default: 24 hours from signal date
+              </div>
+              <div x-show="form.customExpiry" x-cloak>
+                <input type="datetime-local" x-model="form.expiresAt" class="price-input" />
+              </div>
+            </div>
+
+            <!-- Feedback -->
+            <p x-show="formError" x-text="formError" class="text-red-400 text-sm mb-3"></p>
+            <p x-show="formSuccess" x-text="formSuccess" class="text-emerald-400 text-sm mb-3"></p>
+
+            <!-- Submit -->
+            <button type="submit" :disabled="submitting"
+              class="w-full bg-brand text-gray-900 font-bold py-3 rounded-lg hover:bg-brand-dark transition disabled:opacity-50">
+              <span x-show="!submitting">Publish Signal</span>
+              <span x-show="submitting">Publishing…</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── SIGNALS LIST ───────────────────────────────────────────────── -->
+      <div class="xl:col-span-2">
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-4 flex-wrap">
+          <template x-for="tab in ['active','won','lost','all']">
+            <button
+              @click="activeTab = tab"
+              :class="activeTab === tab
+                ? 'bg-brand text-gray-900'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'"
+              class="px-5 py-2 rounded-full text-sm font-semibold transition capitalize"
+              x-text="tab + (tab !== 'all' ? ' (' + signals.filter(s => s.status === tab).length + ')' : ' (' + signals.length + ')')">
+            </button>
+          </template>
+          <button @click="loadSignals()" class="ml-auto text-gray-400 hover:text-white transition text-sm px-3">
+            ↻ Refresh
+          </button>
+        </div>
+
+        <!-- Loading -->
+        <div x-show="loading" class="text-center text-gray-500 py-12">Loading signals…</div>
+
+        <!-- Empty -->
+        <div x-show="!loading && filteredSignals.length === 0"
+          class="bg-gray-900 border border-gray-800 rounded-2xl p-12 text-center text-gray-500">
+          No <span x-text="activeTab"></span> signals found.
+        </div>
+
+        <!-- Cards -->
+        <div class="space-y-4">
+          <template x-for="signal in filteredSignals" :key="signal.id">
+            <div class="bg-gray-900 border border-gray-700 rounded-2xl p-5">
+
+              <!-- Top row: symbol + direction + status -->
+              <div class="flex items-center gap-3 mb-4 flex-wrap">
+                <span class="font-bold text-white text-lg">XAU/USD</span>
+
+                <span :class="signal.direction === 'buy' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'"
+                  class="px-3 py-0.5 rounded-full text-xs font-bold uppercase"
+                  x-text="signal.direction === 'buy' ? '▲ BUY' : '▼ SELL'"></span>
+
+                <span :class="{
+                    'bg-blue-500/20 text-blue-400': signal.status === 'active',
+                    'bg-emerald-500/20 text-emerald-400': signal.status === 'won',
+                    'bg-red-500/20 text-red-400': signal.status === 'lost'
+                  }"
+                  class="px-3 py-0.5 rounded-full text-xs font-bold uppercase"
+                  x-text="signal.status"></span>
+
+                <span x-show="signal.chartTimeframe"
+                  class="bg-gray-700 text-gray-300 px-2 py-0.5 rounded text-xs font-mono"
+                  x-text="signal.chartTimeframe"></span>
+
+                <span x-show="signal.riskReward"
+                  class="ml-auto text-brand font-bold text-sm"
+                  x-text="signal.riskReward ? '1:' + signal.riskReward : ''"></span>
+              </div>
+
+              <!-- Price grid -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div class="bg-gray-800 rounded-lg p-3">
+                  <div class="text-xs text-gray-500 mb-1">Entry</div>
+                  <div class="font-bold font-mono" x-text="signal.entry.toFixed(2)"></div>
+                </div>
+                <div class="bg-red-900/30 rounded-lg p-3">
+                  <div class="text-xs text-gray-500 mb-1">Stop Loss</div>
+                  <div class="font-bold font-mono text-red-400" x-text="signal.stopLoss.toFixed(2)"></div>
+                </div>
+                <div class="bg-emerald-900/30 rounded-lg p-3">
+                  <div class="text-xs text-gray-500 mb-1">TP1</div>
+                  <div class="font-bold font-mono text-emerald-400"
+                    x-text="signal.tp1.toFixed(2) + (signal.tp1HitAt ? ' ✓' : '')"></div>
+                </div>
+                <div x-show="signal.tp2" class="bg-emerald-900/20 rounded-lg p-3">
+                  <div class="text-xs text-gray-500 mb-1">TP2</div>
+                  <div class="font-bold font-mono text-emerald-300"
+                    x-text="signal.tp2 ? signal.tp2.toFixed(2) + (signal.tp2HitAt ? ' ✓' : '') : ''"></div>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <p x-show="signal.description" x-text="signal.description"
+                class="text-gray-400 text-sm mb-4 leading-relaxed"></p>
+
+              <!-- Dates -->
+              <div class="flex gap-4 text-xs text-gray-500 mb-4 flex-wrap">
+                <span>Created: <span class="text-gray-300" x-text="fmtDate(signal.createdAt)"></span></span>
+                <span>Expires: <span
+                  :class="isExpired(signal.expiresAt) && signal.status === 'active' ? 'text-red-400' : 'text-gray-300'"
+                  x-text="fmtDate(signal.expiresAt)"></span></span>
+              </div>
+
+              <!-- Actions -->
+              <div x-show="signal.status === 'active'" class="flex gap-2 flex-wrap">
+                <button @click="markStatus(signal.id, 'won')"
+                  class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm rounded-lg font-semibold transition">
+                  ✓ Mark Won
+                </button>
+                <button @click="markStatus(signal.id, 'lost')"
+                  class="px-4 py-1.5 bg-red-700 hover:bg-red-600 text-white text-sm rounded-lg font-semibold transition">
+                  ✗ Mark Lost
+                </button>
+              </div>
+              <div class="flex gap-2 mt-2">
+                <button @click="confirmDelete(signal.id)"
+                  class="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition">
+                  Delete
+                </button>
+              </div>
+
+            </div>
+          </template>
+        </div>
+      </div>
+    </div><!-- /grid -->
+  </div><!-- /dashboard -->
+
+  <style>
+    .field-label { @apply block text-xs text-gray-400 uppercase tracking-widest mb-1.5; }
+    .price-input { @apply w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-brand transition; }
+  </style>
+
+  <script>
+    function adminApp() {
+      return {
+        // Auth
+        loggedIn: false,
+        password: '',
+        loginError: '',
+        loggingIn: false,
+        token: '',
+
+        // Signals list
+        signals: [],
+        activeTab: 'active',
+        loading: false,
+
+        // Form
+        form: {
+          direction: 'buy',
+          entry: '',
+          stopLoss: '',
+          tp1: '',
+          tp2: '',
+          description: '',
+          chartTimeframe: '1h',
+          signalDate: '',
+          expiresAt: '',
+          customExpiry: false
+        },
+        submitting: false,
+        formError: '',
+        formSuccess: '',
+
+        // ── Computed ─────────────────────────────────────────
+        get rrRatio() {
+          const e = parseFloat(this.form.entry);
+          const sl = parseFloat(this.form.stopLoss);
+          const tp1 = parseFloat(this.form.tp1);
+          if (!e || !sl || !tp1 || isNaN(e) || isNaN(sl) || isNaN(tp1)) return '—';
+          const risk = Math.abs(e - sl);
+          const reward = Math.abs(tp1 - e);
+          if (risk === 0) return '—';
+          return (reward / risk).toFixed(2);
+        },
+
+        get filteredSignals() {
+          if (this.activeTab === 'all') return this.signals;
+          return this.signals.filter(s => s.status === this.activeTab);
+        },
+
+        // ── Init ─────────────────────────────────────────────
+        init() {
+          const stored = localStorage.getItem('theitha_admin_token');
+          if (stored) {
+            this.token = stored;
+            this.loggedIn = true;
+            this.loadSignals();
+          }
+        },
+
+        // ── Auth ─────────────────────────────────────────────
+        async login() {
+          this.loginError = '';
+          this.loggingIn = true;
+          try {
+            const res = await fetch('/api/admin/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ password: this.password })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              this.loginError = data.error || 'Login failed';
+              return;
+            }
+            this.token = data.token;
+            localStorage.setItem('theitha_admin_token', data.token);
+            this.loggedIn = true;
+            this.password = '';
+            this.loadSignals();
+          } catch {
+            this.loginError = 'Connection error. Try again.';
+          } finally {
+            this.loggingIn = false;
+          }
+        },
+
+        logout() {
+          localStorage.removeItem('theitha_admin_token');
+          this.token = '';
+          this.loggedIn = false;
+          this.signals = [];
+        },
+
+        // ── API helpers ───────────────────────────────────────
+        authHeaders() {
+          return {
+            'Authorization': `Bearer ${this.token}`,
+            'Content-Type': 'application/json'
+          };
+        },
+
+        // ── Load signals ──────────────────────────────────────
+        async loadSignals() {
+          this.loading = true;
+          try {
+            const res = await fetch('/api/admin/signals', {
+              headers: this.authHeaders()
+            });
+            if (res.status === 401) { this.logout(); return; }
+            const data = await res.json();
+            this.signals = data.data || [];
+          } catch {
+            // silent
+          } finally {
+            this.loading = false;
+          }
+        },
+
+        // ── Create signal ─────────────────────────────────────
+        async createSignal() {
+          this.formError = '';
+          this.formSuccess = '';
+          this.submitting = true;
+          try {
+            const payload = {
+              symbol: 'XAUUSD',
+              direction: this.form.direction,
+              entry: parseFloat(this.form.entry),
+              stopLoss: parseFloat(this.form.stopLoss),
+              tp1: parseFloat(this.form.tp1),
+              tp2: this.form.tp2 ? parseFloat(this.form.tp2) : null,
+              description: this.form.description || null,
+              chartTimeframe: this.form.chartTimeframe || null,
+              signalDate: this.form.signalDate ? new Date(this.form.signalDate).toISOString() : null,
+              expiresAt: this.form.customExpiry && this.form.expiresAt
+                ? new Date(this.form.expiresAt).toISOString()
+                : null
+            };
+
+            const res = await fetch('/api/admin/signals', {
+              method: 'POST',
+              headers: this.authHeaders(),
+              body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+              this.formError = data.error || 'Failed to create signal';
+              return;
+            }
+            this.formSuccess = 'Signal published successfully!';
+            this.resetForm();
+            this.signals.unshift(data.data);
+            setTimeout(() => { this.formSuccess = ''; }, 4000);
+          } catch {
+            this.formError = 'Connection error. Please try again.';
+          } finally {
+            this.submitting = false;
+          }
+        },
+
+        // ── Mark won/lost ─────────────────────────────────────
+        async markStatus(id, status) {
+          try {
+            const res = await fetch(`/api/admin/signals/${id}`, {
+              method: 'PATCH',
+              headers: this.authHeaders(),
+              body: JSON.stringify({ status })
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            const idx = this.signals.findIndex(s => s.id === id);
+            if (idx !== -1) this.signals[idx] = data.data;
+          } catch {
+            // silent
+          }
+        },
+
+        // ── Delete ────────────────────────────────────────────
+        async confirmDelete(id) {
+          if (!confirm('Delete this signal? This cannot be undone.')) return;
+          try {
+            const res = await fetch(`/api/admin/signals/${id}`, {
+              method: 'DELETE',
+              headers: this.authHeaders()
+            });
+            if (!res.ok) return;
+            this.signals = this.signals.filter(s => s.id !== id);
+          } catch {
+            // silent
+          }
+        },
+
+        // ── Helpers ───────────────────────────────────────────
+        resetForm() {
+          this.form = {
+            direction: 'buy',
+            entry: '', stopLoss: '', tp1: '', tp2: '',
+            description: '', chartTimeframe: '1h',
+            signalDate: '', expiresAt: '', customExpiry: false
+          };
+        },
+
+        fmtDate(iso) {
+          if (!iso) return '—';
+          return new Date(iso).toLocaleString(undefined, {
+            year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+          });
+        },
+
+        isExpired(iso) {
+          if (!iso) return false;
+          return new Date(iso) < new Date();
+        }
+      };
+    }
+  </script>
+</body>
+</html>
