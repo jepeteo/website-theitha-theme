@@ -390,6 +390,19 @@ function renderSignalsMini(target, payload) {
         row.appendChild(arrow);
         row.appendChild(symbol);
         row.appendChild(badge);
+
+        if (signal.riskReward != null) {
+            const rr = document.createElement("span");
+            rr.className = "sidebar-signal-row__rr text-caption text-xs ml-auto";
+            rr.textContent = "1:" + signal.riskReward.toFixed(1);
+            row.appendChild(rr);
+        } else if (signal.chartTimeframe) {
+            const tf = document.createElement("span");
+            tf.className = "sidebar-signal-row__rr text-caption text-xs ml-auto font-mono";
+            tf.textContent = signal.chartTimeframe;
+            row.appendChild(tf);
+        }
+
         target.appendChild(row);
     });
 }
@@ -920,12 +933,12 @@ function renderSignals(target, payload) {
             const dirClass = isBuy ? "card-signal--buy" : "card-signal--sell";
             card.className = `card-signal ${dirClass}`;
 
-            // ── Header row: symbol + badge + time ──
+            // ── Header row: symbol + direction badge + timeframe + time ──
             const header = document.createElement("div");
-            header.className = "flex items-center justify-between mb-1";
+            header.className = "flex items-center justify-between mb-1 flex-wrap gap-1";
 
             const symbolWrap = document.createElement("div");
-            symbolWrap.className = "flex items-center gap-2";
+            symbolWrap.className = "flex items-center gap-2 flex-wrap";
 
             const symbol = document.createElement("span");
             symbol.className = "font-semibold text-text text-base";
@@ -933,10 +946,18 @@ function renderSignals(target, payload) {
 
             const badge = document.createElement("span");
             badge.className = isBuy ? "badge badge--buy" : "badge badge--sell";
-            badge.textContent = signal.direction || (isBuy ? "BUY" : "SELL");
+            badge.textContent = isBuy ? "▲ BUY" : "▼ SELL";
 
             symbolWrap.appendChild(symbol);
             symbolWrap.appendChild(badge);
+
+            if (signal.chartTimeframe) {
+                const tf = document.createElement("span");
+                tf.className = "badge badge--neutral font-mono text-xs";
+                tf.textContent = signal.chartTimeframe;
+                symbolWrap.appendChild(tf);
+            }
+
             header.appendChild(symbolWrap);
 
             const timeStr = relativeTime(signal.createdAt);
@@ -949,38 +970,47 @@ function renderSignals(target, payload) {
 
             card.appendChild(header);
 
-            // ── Confidence bar ──
-            if (signal.confidence != null) {
-                const confRow = document.createElement("div");
-                confRow.className = "flex items-center gap-2 mb-3";
+            // ── Risk/Reward ratio bar ──
+            if (signal.riskReward != null) {
+                const rrRow = document.createElement("div");
+                rrRow.className = "flex items-center gap-2 mb-3";
 
-                const confLabel = document.createElement("span");
-                confLabel.className = "text-caption text-xs";
-                confLabel.textContent = "Confidence";
+                const rrLabel = document.createElement("span");
+                rrLabel.className = "text-caption text-xs";
+                rrLabel.textContent = "Risk / Reward";
 
-                const confBar = buildConfidenceBar(signal.confidence);
+                const rrVal = document.createElement("span");
+                rrVal.className = "data-mono text-xs text-success font-semibold";
+                rrVal.textContent = "1 : " + signal.riskReward.toFixed(2);
 
-                const confVal = document.createElement("span");
-                confVal.className = "data-mono text-xs";
-                confVal.textContent = Math.round(signal.confidence) + "%";
-
-                confRow.appendChild(confLabel);
-                confRow.appendChild(confBar);
-                confRow.appendChild(confVal);
-                card.appendChild(confRow);
+                rrRow.appendChild(rrLabel);
+                rrRow.appendChild(rrVal);
+                card.appendChild(rrRow);
             }
 
-            // ── Price data grid ──
+            // ── Price data grid: Entry, SL, TP1, TP2 ──
             const dataGrid = document.createElement("div");
             dataGrid.className = "signal-data-grid";
 
-            const fields = [
+            const priceFields = [
                 { label: "Entry", value: signal.entry, cls: "" },
-                { label: "Stop Loss", value: signal.stopLoss || signal.sl || "—", cls: "text-danger" },
-                { label: "Take Profit", value: signal.takeProfit || signal.tp || "—", cls: "text-success" }
+                { label: "Stop Loss", value: signal.stopLoss, cls: "text-danger" },
+                {
+                    label: signal.tp1HitAt ? "TP1 ✓" : "TP1",
+                    value: signal.tp1,
+                    cls: signal.tp1HitAt ? "text-success font-bold" : "text-success"
+                }
             ];
 
-            fields.forEach(({ label, value, cls }) => {
+            if (signal.tp2 != null) {
+                priceFields.push({
+                    label: signal.tp2HitAt ? "TP2 ✓" : "TP2",
+                    value: signal.tp2,
+                    cls: signal.tp2HitAt ? "text-success font-bold" : "text-success opacity-80"
+                });
+            }
+
+            priceFields.forEach(({ label, value, cls }) => {
                 const cell = document.createElement("div");
                 cell.className = "flex flex-col";
 
@@ -990,7 +1020,7 @@ function renderSignals(target, payload) {
 
                 const val = document.createElement("span");
                 val.className = "data-mono text-sm " + cls;
-                val.textContent = value;
+                val.textContent = typeof value === "number" ? value.toFixed(2) : (value || "—");
 
                 cell.appendChild(lbl);
                 cell.appendChild(val);
@@ -998,6 +1028,53 @@ function renderSignals(target, payload) {
             });
 
             card.appendChild(dataGrid);
+
+            // ── Description ──
+            if (signal.description) {
+                const desc = document.createElement("p");
+                desc.className = "text-muted text-xs mt-3 leading-relaxed";
+                desc.textContent = signal.description;
+                card.appendChild(desc);
+            }
+
+            // ── Expiry countdown ──
+            if (signal.expiresAt && signal.status === "active") {
+                const expiryEl = document.createElement("div");
+                expiryEl.className = "flex items-center gap-1 mt-3";
+
+                const expiryIcon = document.createElement("span");
+                expiryIcon.className = "text-caption text-xs";
+                expiryIcon.textContent = "⏱";
+
+                const expiryLabel = document.createElement("span");
+                expiryLabel.className = "text-caption text-xs";
+
+                const expiresAt = new Date(signal.expiresAt);
+                const now = new Date();
+                const diffMs = expiresAt - now;
+
+                if (diffMs <= 0) {
+                    expiryLabel.textContent = "Expired";
+                    expiryLabel.classList.add("text-danger");
+                } else {
+                    const diffH = Math.floor(diffMs / 3600000);
+                    const diffM = Math.floor((diffMs % 3600000) / 60000);
+                    if (diffH >= 24) {
+                        const days = Math.floor(diffH / 24);
+                        expiryLabel.textContent = `Expires in ${days}d ${diffH % 24}h`;
+                    } else if (diffH > 0) {
+                        expiryLabel.textContent = `Expires in ${diffH}h ${diffM}m`;
+                    } else {
+                        expiryLabel.textContent = `Expires in ${diffM}m`;
+                        expiryLabel.classList.add("text-warning");
+                    }
+                }
+
+                expiryEl.appendChild(expiryIcon);
+                expiryEl.appendChild(expiryLabel);
+                card.appendChild(expiryEl);
+            }
+
             target.appendChild(card);
             return;
         }
