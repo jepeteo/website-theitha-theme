@@ -58,9 +58,15 @@ const mockedSignals: TradingSignal[] = [
     direction: "buy",
     entry: 2600,
     stopLoss: 2580,
-    takeProfit: 2650,
-    confidence: 88,
-    createdAt: new Date().toISOString()
+    tp1: 2650,
+    tp2: null,
+    description: null,
+    chartTimeframe: "1h",
+    riskReward: 2.5,
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 86400000).toISOString(),
+    tp1HitAt: null,
+    tp2HitAt: null
   },
   {
     id: "sig_btc",
@@ -69,9 +75,15 @@ const mockedSignals: TradingSignal[] = [
     direction: "sell",
     entry: 100000,
     stopLoss: 102000,
-    takeProfit: 95000,
-    confidence: 73,
-    createdAt: new Date().toISOString()
+    tp1: 95000,
+    tp2: null,
+    description: null,
+    chartTimeframe: "4h",
+    riskReward: 2.5,
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 86400000).toISOString(),
+    tp1HitAt: null,
+    tp2HitAt: null
   }
 ];
 
@@ -83,6 +95,8 @@ function setupEnv(): void {
   process.env.GHOST_ADMIN_API_KEY =
     "adminid:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd";
   process.env.DATABASE_URL = "postgres://localhost/test";
+  process.env.TWELVE_DATA_API_KEY = "test_key";
+  process.env.ADMIN_PASSWORD = "test_password";
   process.env.JWKS_CACHE_TTL = "3600";
   process.env.MEMBER_CACHE_TTL = "60";
   process.env.SUMMARY_CACHE_TTL = "30";

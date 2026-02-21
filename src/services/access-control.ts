@@ -38,9 +38,15 @@ export function toSignalView(
     direction: signal.direction,
     entry: signal.entry,
     stopLoss: signal.stopLoss,
-    takeProfit: signal.takeProfit,
-    confidence: signal.confidence,
-    createdAt: signal.createdAt
+    tp1: signal.tp1,
+    tp2: signal.tp2,
+    description: signal.description,
+    chartTimeframe: signal.chartTimeframe,
+    riskReward: signal.riskReward,
+    createdAt: signal.createdAt,
+    expiresAt: signal.expiresAt,
+    tp1HitAt: signal.tp1HitAt,
+    tp2HitAt: signal.tp2HitAt
   };
 
   return fullSignal;

@@ -13,6 +13,8 @@ const env: AppEnv = {
   ghostAdminApiUrl: "https://investment-trading-hub-academy.ghost.io/ghost/api/admin/",
   ghostAdminApiKey: "dummyid:abcdef1234567890abcdef1234567890",
   databaseUrl: "postgres://localhost/test",
+  twelveDataApiKey: "test_key",
+  adminPassword: "test_password",
   adminBypassEmails: [],
   jwksCacheTtlSeconds: 3600,
   memberCacheTtlSeconds: 60,

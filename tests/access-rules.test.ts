@@ -11,9 +11,15 @@ const baseSignal: TradingSignal = {
   direction: "buy",
   entry: 2600,
   stopLoss: 2580,
-  takeProfit: 2650,
-  confidence: 88,
-  createdAt: new Date().toISOString()
+  tp1: 2650,
+  tp2: null,
+  description: null,
+  chartTimeframe: "1h",
+  riskReward: 2.5,
+  createdAt: new Date().toISOString(),
+  expiresAt: new Date(Date.now() + 86400000).toISOString(),
+  tp1HitAt: null,
+  tp2HitAt: null
 };
 
 const btcSignal: TradingSignal = {
