@@ -113,6 +113,21 @@ export async function fetchRecentSignals(
   return result.rows.map(mapSignalRow);
 }
 
+export async function fetchActiveSignals(pool: Pool): Promise<TradingSignal[]> {
+  const query = `
+    SELECT
+      id, symbol, status, direction, entry, stop_loss, tp1, tp2,
+      description, chart_timeframe, risk_reward, created_at,
+      COALESCE(expires_at, created_at + INTERVAL '24 hours') AS expires_at,
+      tp1_hit_at, tp2_hit_at
+    FROM signals
+    WHERE status = 'active'
+    ORDER BY created_at ASC;
+  `;
+  const result = await pool.query<SignalRow>(query);
+  return result.rows.map(mapSignalRow);
+}
+
 export async function fetchAllSignalsAdmin(pool: Pool): Promise<TradingSignal[]> {
   const query = `
     SELECT
