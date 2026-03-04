@@ -46,9 +46,11 @@ export function toTwelveDataSymbol(symbol: string): string {
   const map: Record<string, string> = {
     XAUUSD: "XAU/USD",
     XAGUSD: "XAG/USD",
+    WTIUSD: "WTI/USD",
     EURUSD: "EUR/USD",
     GBPUSD: "GBP/USD",
     USDJPY: "USD/JPY",
+    USDCHF: "USD/CHF",
     BTCUSD: "BTC/USD",
     ETHUSD: "ETH/USD"
   };

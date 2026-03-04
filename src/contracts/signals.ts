@@ -2,7 +2,7 @@ import type { MemberTier } from "./auth-context.js";
 
 export type SignalSymbol = string;
 export type SignalStatus = "active" | "won" | "lost";
-export type ChartTimeframe = "1m" | "5m" | "15m" | "30m" | "1h" | "4h" | "1d" | "1w";
+export type ChartTimeframe = "intraday" | "daily" | "weekly";
 
 export type TradingSignal = {
   id: string;

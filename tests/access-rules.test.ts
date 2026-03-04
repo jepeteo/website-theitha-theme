@@ -14,7 +14,7 @@ const baseSignal: TradingSignal = {
   tp1: 2650,
   tp2: null,
   description: null,
-  chartTimeframe: "1h",
+  chartTimeframe: "intraday",
   riskReward: 2.5,
   createdAt: new Date().toISOString(),
   expiresAt: new Date(Date.now() + 86400000).toISOString(),
