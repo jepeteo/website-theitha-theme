@@ -237,22 +237,22 @@
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="text-[10px] text-gray-500 font-medium uppercase tracking-wider mb-1 block">Entry *</label>
-                    <input type="number" step="0.01" x-model="form.entry" required placeholder="2320.50" class="fi !bg-surface-3 !text-sm !py-2" />
+                    <input type="number" step="0.00001" x-model="form.entry" required placeholder="2320.50" class="fi !bg-surface-3 !text-sm !py-2" />
                   </div>
                   <div>
                     <label class="text-[10px] text-gray-500 font-medium uppercase tracking-wider mb-1 block">Stop Loss *</label>
-                    <input type="number" step="0.01" x-model="form.stopLoss" required placeholder="2300.00" class="fi !bg-surface-3 !text-sm !py-2 focus:!border-red-500/60" />
+                    <input type="number" step="0.00001" x-model="form.stopLoss" required placeholder="2300.00" class="fi !bg-surface-3 !text-sm !py-2 focus:!border-red-500/60" />
                   </div>
                 </div>
                 <div class="h-px bg-surface-4/60"></div>
                 <div class="grid grid-cols-2 gap-3">
                   <div>
                     <label class="text-[10px] text-emerald-400/70 font-medium uppercase tracking-wider mb-1 block">TP1 *</label>
-                    <input type="number" step="0.01" x-model="form.tp1" required placeholder="2360.00" class="fi !bg-surface-3 !text-sm !py-2 focus:!border-emerald-500/60" />
+                    <input type="number" step="0.00001" x-model="form.tp1" required placeholder="2360.00" class="fi !bg-surface-3 !text-sm !py-2 focus:!border-emerald-500/60" />
                   </div>
                   <div>
                     <label class="text-[10px] text-emerald-400/50 font-medium uppercase tracking-wider mb-1 block">TP2 <span class="text-gray-600 normal-case">(opt)</span></label>
-                    <input type="number" step="0.01" x-model="form.tp2" placeholder="2400.00" class="fi !bg-surface-3 !text-sm !py-2 focus:!border-emerald-500/60" />
+                    <input type="number" step="0.00001" x-model="form.tp2" placeholder="2400.00" class="fi !bg-surface-3 !text-sm !py-2 focus:!border-emerald-500/60" />
                   </div>
                 </div>
               </div>
@@ -454,18 +454,18 @@
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <div class="bg-surface-2 rounded-lg p-3 border border-surface-4/40">
                     <div class="text-[10px] text-gray-500 font-medium uppercase tracking-wider mb-1">Entry</div>
-                    <div class="font-bold font-mono text-white text-sm" x-text="signal.entry.toFixed(2)"></div>
+                    <div class="font-bold font-mono text-white text-sm" x-text="fmtPrice(signal.entry)"></div>
                   </div>
                   <div class="bg-surface-2 rounded-lg p-3 border border-red-500/10">
                     <div class="text-[10px] text-red-400/60 font-medium uppercase tracking-wider mb-1">Stop Loss</div>
-                    <div class="font-bold font-mono text-red-400 text-sm" x-text="signal.stopLoss.toFixed(2)"></div>
+                    <div class="font-bold font-mono text-red-400 text-sm" x-text="fmtPrice(signal.stopLoss)"></div>
                   </div>
                   <div class="bg-surface-2 rounded-lg p-3 border border-emerald-500/10">
                     <div class="text-[10px] font-medium uppercase tracking-wider mb-1"
                       :class="signal.tp1HitAt ? 'text-emerald-400' : 'text-emerald-400/60'">
                       TP1 <span x-show="signal.tp1HitAt" class="text-emerald-400">✓</span>
                     </div>
-                    <div class="font-bold font-mono text-emerald-400 text-sm" x-text="signal.tp1.toFixed(2)"></div>
+                    <div class="font-bold font-mono text-emerald-400 text-sm" x-text="fmtPrice(signal.tp1)"></div>
                   </div>
                   <div x-show="signal.tp2" class="bg-surface-2 rounded-lg p-3 border border-emerald-500/5">
                     <div class="text-[10px] font-medium uppercase tracking-wider mb-1"
@@ -473,7 +473,7 @@
                       TP2 <span x-show="signal.tp2HitAt" class="text-emerald-300">✓</span>
                     </div>
                     <div class="font-bold font-mono text-emerald-300 text-sm"
-                      x-text="signal.tp2 ? signal.tp2.toFixed(2) : ''"></div>
+                      x-text="signal.tp2 ? fmtPrice(signal.tp2) : ''"></div>
                   </div>
                 </div>
               </div>
@@ -748,6 +748,16 @@
             description: '', chartTimeframe: 'intraday',
             signalDate: '', expiresAt: '', customExpiry: false
           };
+        },
+
+        /* Format price preserving user-entered decimals (up to 5) */
+        fmtPrice(n) {
+          if (typeof n !== 'number' || isNaN(n)) return '—';
+          const s = n.toString();
+          const dot = s.indexOf('.');
+          if (dot === -1) return s;
+          const decimals = s.length - dot - 1;
+          return decimals <= 5 ? s : n.toFixed(5);
         },
 
         fmtDate(iso) {

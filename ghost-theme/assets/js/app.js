@@ -911,6 +911,18 @@ function getSymbolIcon(symbol) {
 }
 
 /**
+ * Format price preserving user-entered decimal precision (up to 5 digits).
+ */
+function fmtPrice(n) {
+    if (typeof n !== "number" || isNaN(n)) return "—";
+    const s = n.toString();
+    const dot = s.indexOf(".");
+    if (dot === -1) return s;
+    const decimals = s.length - dot - 1;
+    return decimals <= 5 ? s : n.toFixed(5);
+}
+
+/**
  * Format symbol for display (e.g. XAUUSD → XAU/USD).
  */
 function formatSymbol(symbol) {
@@ -1134,7 +1146,7 @@ function renderSignals(target, payload) {
 
                 const val = document.createElement("span");
                 val.className = "sc-price__value";
-                val.textContent = typeof value === "number" ? value.toFixed(2) : (value || "—");
+                val.textContent = typeof value === "number" ? fmtPrice(value) : (value || "—");
 
                 box.appendChild(lbl);
                 box.appendChild(val);
