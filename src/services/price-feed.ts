@@ -1,5 +1,13 @@
 const TWELVE_DATA_BASE = "https://api.twelvedata.com";
 
+/**
+ * Internal signal symbols that Twelve Data does not price.
+ * Cron and other callers should skip HTTP calls for these to avoid repeated failed requests.
+ */
+export const SYMBOLS_WITHOUT_TWELVE_DATA_PRICE: ReadonlySet<string> = new Set([
+  "WTIUSD"
+]);
+
 export type LivePrice = {
   symbol: string;
   price: number;

@@ -1,5 +1,4 @@
-const SIGNALS_URL = "https://api.theitha.com/api/signals/list";
-const SUMMARY_URL = "https://api.theitha.com/api/signals/summary";
+const BOOTSTRAP_URL = "https://api.theitha.com/api/signals/bootstrap";
 
 let cachedMemberToken = null;
 let cachedMemberUuid = null;
@@ -1235,10 +1234,9 @@ async function loadData() {
     }
 
     try {
-        const [summary, signals] = await Promise.all([
-            fetchJson(SUMMARY_URL),
-            fetchJson(SIGNALS_URL)
-        ]);
+        const payload = await fetchJson(BOOTSTRAP_URL);
+        const summary = payload.summary;
+        const signals = payload.list;
 
         cachedSignalsPayload = signals;
         const filteredSignals = applySignalsFilters(signals);

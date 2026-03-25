@@ -7,6 +7,7 @@ import {
 import type { TradingSignal } from "../../src/contracts/signals.js";
 import {
   fetchLivePrice,
+  SYMBOLS_WITHOUT_TWELVE_DATA_PRICE,
   toTwelveDataSymbol
 } from "../../src/services/price-feed.js";
 
@@ -138,6 +139,10 @@ export default async function handler(
   const priceErrors: string[] = [];
 
   for (const symbol of uniqueSymbols) {
+    if (SYMBOLS_WITHOUT_TWELVE_DATA_PRICE.has(symbol.toUpperCase())) {
+      continue;
+    }
+
     try {
       const tdSymbol = toTwelveDataSymbol(symbol);
       const live = await fetchLivePrice(tdSymbol, env.twelveDataApiKey);

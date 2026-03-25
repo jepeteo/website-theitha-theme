@@ -61,6 +61,12 @@ export type SignalsSummaryResponse = {
   updatedAt: string;
 };
 
+/** Combined payload for a single page load; `summary` and `list` match the standalone endpoints. */
+export type SignalsBootstrapResponse = {
+  summary: SignalsSummaryResponse;
+  list: SignalsListResponse;
+};
+
 export type CreateSignalInput = {
   symbol: SignalSymbol;
   direction: "buy" | "sell";

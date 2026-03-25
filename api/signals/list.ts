@@ -8,6 +8,12 @@ import { ApiError, isApiError } from "../../src/security/errors.js";
 import { checkRateLimit } from "../../src/security/rate-limit.js";
 import type { TradingSignal } from "../../src/contracts/signals.js";
 
+// Per warm instance; same TTL as summary. Disabled when tests inject fetchSignals.
+const listResponseCache = new Map<
+  string,
+  { data: SignalsListResponse; expiresAtMs: number }
+>();
+
 type VercelRequest = {
   method?: string;
   headers: Record<string, string | string[] | undefined>;
@@ -58,6 +64,7 @@ function defaultFetchSignals(limit: number): Promise<TradingSignal[]> {
 
 export function createSignalsListHandler(deps: ListHandlerDeps = {}) {
   const fetchSignals = deps.fetchSignals ?? defaultFetchSignals;
+  const useResponseCache = deps.fetchSignals === undefined;
 
   return async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
     try {
@@ -87,12 +94,32 @@ export function createSignalsListHandler(deps: ListHandlerDeps = {}) {
       }
 
       const authContext = await resolveAuthContextFromRequest(req);
-      const signals = await fetchSignals(readLimitParam(req.query));
+      const limit = readLimitParam(req.query);
+      const cacheKey = `${authContext.tier}:${limit}`;
+      const nowMs = Date.now();
+
+      if (useResponseCache) {
+        const cached = listResponseCache.get(cacheKey);
+        if (cached !== undefined && cached.expiresAtMs > nowMs) {
+          res.status(200).json(cached.data);
+          return;
+        }
+      }
+
+      const signals = await fetchSignals(limit);
 
       const response: SignalsListResponse = {
         tier: authContext.tier,
         data: applySignalAccess(signals, authContext)
       };
+
+      if (useResponseCache) {
+        const env = getAppEnv();
+        listResponseCache.set(cacheKey, {
+          data: response,
+          expiresAtMs: nowMs + env.summaryCacheTtlSeconds * 1000
+        });
+      }
 
       res.status(200).json(response);
     } catch (error: unknown) {
