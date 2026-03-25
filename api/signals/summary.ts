@@ -5,6 +5,12 @@ import { resolveAuthContextFromRequest } from "../../src/services/auth-context-r
 import { ApiError, isApiError } from "../../src/security/errors.js";
 import { checkRateLimit } from "../../src/security/rate-limit.js";
 
+// Per warm serverless instance only; cuts repeat aggregate queries while TTL is fresh.
+let summaryCacheEntry: {
+  data: Awaited<ReturnType<typeof fetchSignalSummary>>;
+  expiresAtMs: number;
+} | null = null;
+
 type VercelRequest = {
   method?: string;
   headers: Record<string, string | string[] | undefined>;
@@ -57,8 +63,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     await resolveAuthContextFromRequest(req);
 
     const env = getAppEnv();
+    const now = Date.now();
+    if (summaryCacheEntry !== null && summaryCacheEntry.expiresAtMs > now) {
+      res.status(200).json(summaryCacheEntry.data);
+      return;
+    }
+
     const pool = getDbPool(env);
     const summary = await fetchSignalSummary(pool);
+    summaryCacheEntry = {
+      data: summary,
+      expiresAtMs: now + env.summaryCacheTtlSeconds * 1000
+    };
 
     res.status(200).json(summary);
   } catch (error: unknown) {
