@@ -1,0 +1,49 @@
+<section class="theitha-sponsor-slot theitha-sponsor-slot--banner" aria-label="Sponsored">
+  <a
+    href="https://cabinet.switchmarkets.com/links/go/14940"
+    class="theitha-sponsor-slot__link theitha-sponsor-slot__link--banner"
+    target="_blank"
+    rel="sponsored noopener noreferrer"
+  >
+    <img
+      src="https://cabinet.switchmarkets.com/uploads/public/banners/2026/01/13/2d6b602d01a24b4892c69baabb2a089a.png"
+      alt="Switch Markets sponsored banner"
+      class="theitha-sponsor-slot__image theitha-sponsor-slot__image--banner"
+      loading="lazy"
+    />
+  </a>
+</section>
+
+{{#is "home"}}
+  <section class="theitha-sponsor-slot theitha-sponsor-slot--xm-home" aria-label="Sponsored">
+    <a
+      href="https://www.xmglobal.com/referral?token=yl0fMBGTTki6juOBvBRmgA"
+      class="theitha-sponsor-slot__link theitha-sponsor-slot__link--xm-home"
+      target="_blank"
+      rel="sponsored noopener noreferrer"
+    >
+      <img
+        src="{{asset "images/ads/xm-banner-wide.jpg"}}"
+        alt="Trade with XM via Theitha"
+        class="theitha-sponsor-slot__image theitha-sponsor-slot__image--xm-home"
+        loading="lazy"
+      />
+    </a>
+  </section>
+{{else}}
+  <section class="theitha-sponsor-slot theitha-sponsor-slot--xm-inline" aria-label="Sponsored">
+    <a
+      href="https://www.xmglobal.com/referral?token=yl0fMBGTTki6juOBvBRmgA"
+      class="theitha-sponsor-slot__link theitha-sponsor-slot__link--xm-inline"
+      target="_blank"
+      rel="sponsored noopener noreferrer"
+    >
+      <img
+        src="{{asset "images/ads/xm-banner-wide.jpg"}}"
+        alt="Trade with XM via Theitha"
+        class="theitha-sponsor-slot__image theitha-sponsor-slot__image--xm-inline"
+        loading="lazy"
+      />
+    </a>
+  </section>
+{{/is}}
