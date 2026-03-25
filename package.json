@@ -9,8 +9,8 @@
     "scripts": {
         "typecheck": "tsc --noEmit",
         "build": "tsc -p tsconfig.json",
-        "test": "node --import tsx --test tests/*.test.ts",
-        "test:auth": "node --import tsx --test tests/auth-integration.test.ts"
+        "test": "node --import ./scripts/load-dotenv.mjs --import tsx --test tests/*.test.ts",
+        "test:auth": "node --import ./scripts/load-dotenv.mjs --import tsx --test tests/auth-integration.test.ts"
     },
     "dependencies": {
         "jose": "^5.9.6",
@@ -19,6 +19,7 @@
     "devDependencies": {
         "@types/node": "^22.10.2",
         "@types/pg": "^8.11.10",
+        "dotenv": "^17.3.1",
         "nock": "^14.0.10",
         "tsx": "^4.19.2",
         "typescript": "^5.7.2"
